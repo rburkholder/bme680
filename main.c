@@ -139,7 +139,47 @@ int open_i2c_bus( int id_bus ) {
 
   snprintf( filename, 19, "/dev/i2c-%d", id_bus );
   fd = open( filename, O_RDWR);
+  if ( 0 > fd ) {
+    /* ERROR HANDLING; you can check errno to see what went wrong */
+    printf( "file error (%d)\n", fd );
+  }
+
   return fd;
+}
+
+int open_i2c_device( int id_bus, u8 id_device ) {
+
+  int fd;
+
+  fd = open_i2c_bus( id_bus );
+  if ( 0 <= fd ) {
+    if ( 0 > ioctl( fd, I2C_SLAVE, id_device ) ) {
+      /* ERROR HANDLING; you can check errno to see what went wrong */
+      printf( "ioctl error (%d)\n", fd );
+    }
+  }
+
+  return fd;
+
+}
+
+int read_register( int fd, u8 reg, u8* data ) {
+
+  int result;
+
+  result = write( fd, &reg, 1 );
+  if ( 0 > result ) {
+    printf( "register write failed (%d)\n", result );
+  }
+  else {
+    result = read( fd, data, 1 );
+    if ( 0 > result ) {
+      printf( "register read failed (%d)\n", result );
+    }
+  }
+
+  return result;
+
 }
 
 void main() {
@@ -151,39 +191,23 @@ void main() {
 
   u8 buf[0x20];
 
-  fd_bme680 = open_i2c_bus( i2c_id_bus );
-  if ( 0 > fd_bme680 ) {
-    /* ERROR HANDLING; you can check errno to see what went wrong */
-    printf( "file error (%s)\n", fd_bme680 );
-    exit(1);
+  fd_bme680 = open_i2c_device( i2c_id_bus, i2c_addr_bme680 );
+  if ( 0 <= fd_bme680 ) {
+
+    u8 data;
+
+    int result = read_register( fd_bme680, ctrl_chip_id, &data );
+    if ( 0 <= result ) {
+      if ( 0x61 == data ) {
+        printf( "found correct chip id\n" );
+      }
+      else {
+        printf( "unexpected chip id = 0x%02x", result );
+      }
+    }
+
   }
 
-  if ( 0 > ioctl( fd_bme680, I2C_SLAVE, i2c_addr_bme680) ) {
-    /* ERROR HANDLING; you can check errno to see what went wrong */
-    printf( "ioctl error\n" );
-   exit(1);
-  } 
-
-  // chip id of BME680 in register 0xd0
-  u8 reg = ctrl_chip_id;
-  if ( 0 > write( fd_bme680, &reg, 1 ) ) {
-    printf( "write failed\n" );
-    exit( 1 );
-  }
-
-  u8 result;
-  if ( 0 > read( fd_bme680, &result, 1 ) ) {
-    printf( "read failed\n" );
-    exit( 1 );
-  }
-
-  if ( 0x61 == result ) {
-    printf( "found correct chip id\n" );
-  }
-  else {
-    printf( "unexpected chip id = 0x%02x", result );
-  }
-   
   printf( "done\n" );
 }
 
