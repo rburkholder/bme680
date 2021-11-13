@@ -68,8 +68,14 @@ typedef unsigned char   u8;
 #define temp_adc_hi             0x22
 #define temp_adc_mid            0x23
 #define temp_adc_lo             0x24
-// page 30 section 5.3.2.2
+// page 30 section 5.3.2.2 - shared with pressure
 #define temperature_control     0x74
+#define temperature_os_skip     0x00
+#define temperature_os_x1       0b00100000
+#define temperature_os_x2       0b01000000
+#define temperature_os_x4       0b01100000
+#define temperature_os_x8       0b10000000
+#define temperature_os_x16      0b10100000
 
 // page 19 - registers for value pressure retrieval:
 #define calibration_parm_p1_msb 0x8f
@@ -91,8 +97,14 @@ typedef unsigned char   u8;
 #define pressure_adc_msb        0x1f
 #define pressure_adc_mid        0x20
 #define pressure_adc_lsb        0x21
-// page 31 section 5.3.2.3
+// page 31 section 5.3.2.3 - shared with temperature
 #define pressure_control        0x74
+#define pressure_os_skip        0x00
+#define pressure_os_x1          0b00000100
+#define pressure_os_x2          0b00001000
+#define pressure_os_x4          0b00001100
+#define pressure_os_x8          0b00010000
+#define pressure_os_x16         0b00010100
 
 // page 20 - registers for value humidity retrieval:
 #define calibration_parm_h1_msb 0xe3
@@ -108,10 +120,24 @@ typedef unsigned char   u8;
 #define humidity_adc_lsb        0x26
 // page 30 section 5.3.2.1
 #define humidity_control        0x72
+#define humidity_os_skip        0x00
+#define humidity_os_x1          0b00000001
+#define humidity_os_x2          0b00000010
+#define humidity_os_x4          0b00000011
+#define humidity_os_x8          0b00000100
+#define humidity_os_x16         0b00000101
 
 // page 31 section 5.3.2.4 - IIR filter control
 //    temperature & pressure
 #define iir_filter_control      0x75
+#define iir_filter_coef_0       0b00000000
+#define iir_filter_coef_1       0b00000100
+#define iir_filter_coef_3       0b00001000
+#define iir_filter_coef_7       0b00001100
+#define iir_filter_coef_15      0b00010000
+#define iir_filter_coef_31      0b00010100
+#define iir_filter_coef_63      0b00011000
+#define iir_filter_coef_127     0b00011100
 
 // page 22 - registers for value heater:
 #define heater_parm_g1          0xed
@@ -129,6 +155,10 @@ typedef unsigned char   u8;
 
 // page 36 - status registers
 #define measurement_status      0x1d
+#define status_new_data         0b10000000
+#define status_measuring_gas    0b01000000
+#define status_measuring        0b00100000
+#define status_measuring_gas_ix 0b00001111
 
 // end bme680 definitions
 
@@ -163,19 +193,45 @@ int open_i2c_device( int id_bus, u8 id_device ) {
 
 }
 
-int read_register( int fd, u8 reg, u8* data ) {
+int read_registers( int fd, u8 reg, u8* data, int length ) {
 
   int result;
 
   result = write( fd, &reg, 1 );
   if ( 0 > result ) {
-    printf( "register write failed (%d)\n", result );
+    printf( "register select failed (%d)\n", result );
   }
   else {
-    result = read( fd, data, 1 );
+    result = read( fd, data, length );
     if ( 0 > result ) {
       printf( "register read failed (%d)\n", result );
     }
+  }
+
+  return result;
+
+}
+
+int read_register( int fd, u8 reg, u8* data ) {
+
+  int result;
+
+  result = read_registers( fd, reg, data, 1 );
+
+  return result;
+
+}
+
+int write_register( int fd, u8 reg, u8 data ) {
+
+  u8 buf[ 2 ];
+
+  buf[ 0 ] = reg;
+  buf[ 1 ] = data;
+
+  int result = write( fd, &buf, 2 );
+  if ( 0 > result ) {
+    printf( "register write failed (%d)\n", result );
   }
 
   return result;
@@ -198,6 +254,57 @@ int check_chip_id( int fd_bme680 ) {
   return result;
 }
 
+int measure_pth( int fd_bme680, int* pressure, int* temperature, int* humidity ) {
+
+  int result;
+  u8 status;
+
+  // wait for any pending measurements to complete
+  do {
+    result = read_register( fd_bme680, measurement_status, &status );
+  } while ( 0 < ( ( status_measuring | status_measuring_gas ) & status ) );
+
+  // initiate a humidity, pressure, temperature measurement
+  result = write_register( fd_bme680, humidity_control, humidity_os_x1 );
+  result = write_register( fd_bme680, ctrl_op_mode, temperature_os_x1 | pressure_os_x1 | op_mode_forced );
+
+  // wait for any pending measurements to complete
+  int loops = 0;
+  do {
+    result = read_register( fd_bme680, measurement_status, &status );
+    //printf( "loop %d: status=0x%02x\n", loops, status );
+    loops++;
+  } while ( 0 < ( ( status_measuring | status_measuring_gas ) & status ) );
+  //printf( "waited %d loops\n", loops );
+
+  if ( 0 < ( status_new_data & status ) ) {
+
+    u8 bufPressure[ 3 ];
+    result = read_registers( fd_bme680, pressure_adc_msb, bufPressure, 3 );
+    *pressure =                        bufPressure[ 0 ];
+    *pressure = ( *pressure << 8 ) |   bufPressure[ 1 ];
+    *pressure = ( *pressure << 4 ) | ( bufPressure[ 2 ] >> 4 );
+
+    u8 bufTemperature[ 3 ];
+    result = read_registers( fd_bme680, temp_adc_hi, bufTemperature, 3 );
+    *temperature =                           bufTemperature[ 0 ];
+    *temperature = ( *temperature << 8 ) |   bufTemperature[ 1 ];
+    *temperature = ( *temperature << 4 ) | ( bufTemperature[ 2 ] >> 4 );
+
+    u8 bufHumidity[ 2 ];
+    result = read_registers( fd_bme680, humidity_adc_msb, bufHumidity, 2 );
+    *humidity =                      bufHumidity[ 0 ];
+    *humidity = ( *humidity << 8 ) | bufHumidity[ 1 ];
+
+  }
+  else {
+    printf( "no data available (0x%02x)", status );
+  }
+
+  return result;
+
+}
+
 void main() {
 
   int i2c_id_bus = 2; /* seeed beagleboard green bus number */
@@ -211,6 +318,16 @@ void main() {
     int result;
 
     result = check_chip_id( fd_bme680 );
+
+    int rawPressure;
+    int rawTemperature;
+    int rawHumidity;
+
+    while ( 1 ) {
+      result = measure_pth( fd_bme680, &rawPressure, &rawTemperature, &rawHumidity );
+      printf( "p=%d, t=%d, h=%d\n", rawPressure, rawTemperature, rawHumidity );
+      sleep( 1 );
+    }
 
   }
 
