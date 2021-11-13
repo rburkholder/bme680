@@ -182,32 +182,39 @@ int read_register( int fd, u8 reg, u8* data ) {
 
 }
 
+int check_chip_id( int fd_bme680 ) {
+
+  u8 data;
+
+  int result = read_register( fd_bme680, ctrl_chip_id, &data );
+  if ( 0 <= result ) {
+    if ( 0x61 == data ) {
+      printf( "found correct chip id\n" );
+    }
+    else {
+      printf( "unexpected chip id = 0x%02x", result );
+    }
+  }
+  return result;
+}
+
 void main() {
 
-  int i2c_id_bus = 2; /* beagleboard bus number */
+  int i2c_id_bus = 2; /* seeed beagleboard green bus number */
   u8  i2c_addr_bme680 = 0x76; /* seeed bme680 board */
 
   int fd_bme680; /* file descripter for device when opened */
 
-  u8 buf[0x20];
-
   fd_bme680 = open_i2c_device( i2c_id_bus, i2c_addr_bme680 );
   if ( 0 <= fd_bme680 ) {
 
-    u8 data;
+    int result;
 
-    int result = read_register( fd_bme680, ctrl_chip_id, &data );
-    if ( 0 <= result ) {
-      if ( 0x61 == data ) {
-        printf( "found correct chip id\n" );
-      }
-      else {
-        printf( "unexpected chip id = 0x%02x", result );
-      }
-    }
+    result = check_chip_id( fd_bme680 );
 
   }
 
+  close( fd_bme680 );
   printf( "done\n" );
 }
 
