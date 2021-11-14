@@ -12,6 +12,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 
 #include <unistd.h>
 
@@ -248,13 +249,217 @@ int check_chip_id( int fd_bme680 ) {
       printf( "found correct chip id\n" );
     }
     else {
+      result = 0;
       printf( "unexpected chip id = 0x%02x", result );
     }
   }
   return result;
 }
 
-int measure_pth( int fd_bme680, int* pressure, int* temperature, int* humidity ) {
+struct temperature {
+  int32_t par_t1;
+  int32_t par_t2;
+  int32_t par_t3;
+  int32_t raw;
+  int32_t fine; // used in pressure
+  int32_t compensated; // _.xx celcius
+};
+
+int read_temperature_calibration( int fd_bme680, struct temperature* t ) {
+
+  int result;
+
+  {
+    u8 buf[ 2 ];
+
+    result = read_registers( fd_bme680, calibration_parm_t1_lsb, buf, 2 );
+
+    t->par_t1 =                      buf[ 1 ];
+    t->par_t1 = ( t->par_t1 << 8 ) | buf[ 0 ];
+  }
+
+  {
+    u8 buf[ 3 ];
+
+    result = read_registers( fd_bme680, calibration_parm_t2_lsb, buf, 3 );
+
+    t->par_t2 =                      buf[ 1 ];
+    t->par_t2 = ( t->par_t2 << 8 ) | buf[ 0 ];
+
+    t->par_t3 = buf[ 2 ];
+  }
+
+  return result;
+}
+
+void compensate_temperature( struct temperature* t ) {
+
+  // it is interesting to note that the lower 3 bits of the raw temperature are thrown away
+  int32_t var1 = ( t->raw >> 3 ) - ( t->par_t1 << 1 );
+  int32_t var2 = ( var1 * t->par_t2 ) >> 11;
+  int32_t var3 = ( ( ( ( var1 >> 1 ) * ( var1 >> 1 ) ) >> 12 ) * ( t->par_t3 << 4 ) ) >> 14;
+  t->fine = var2 + var3;
+  t->compensated = ( ( t->fine * 5 ) + 128 ) >> 8;
+}
+
+struct pressure {
+  int32_t par_p1;
+  int32_t par_p2;
+  int32_t par_p3;
+  int32_t par_p4;
+  int32_t par_p5;
+  int32_t par_p6;
+  int32_t par_p7;
+  int32_t par_p8;
+  int32_t par_p9;
+  int32_t par_p10;
+  int32_t raw;
+  int32_t compensated; // pascal
+};
+
+int read_pressure_calibration( int fd_bme680, struct pressure* p ) {
+
+  int result;
+
+  const int32_t size = 1 + ( 0xa0 - 0x8e );
+  u8 buf[ size ];
+
+  result = read_registers( fd_bme680, 0x8e, buf, size );
+
+  p->par_p1 =                      buf[ 0x8f - 0x8e ];
+  p->par_p1 = ( p->par_p1 << 8 ) | buf[ 0x8e - 0x8e ];
+
+  p->par_p2 =                      buf[ 0x91 - 0x8e ];
+  p->par_p2 = ( p->par_p2 << 8 ) | buf[ 0x90 - 0x8e ];
+
+  p->par_p3 =                      buf[ 0x92 - 0x8e ];
+
+  p->par_p4 =                      buf[ 0x95 - 0x8e ];
+  p->par_p4 = ( p->par_p4 << 8 ) | buf[ 0x94 - 0x8e ];
+
+  p->par_p5 =                      buf[ 0x97 - 0x8e ];
+  p->par_p5 = ( p->par_p5 << 8 ) | buf[ 0x96 - 0x8e ];
+
+  p->par_p6 =                      buf[ 0x99 - 0x8e ];
+
+  p->par_p7 =                      buf[ 0x98 - 0x8e ];
+
+  p->par_p8 =                      buf[ 0x9d - 0x8e ];
+  p->par_p8 = ( p->par_p8 << 8 ) | buf[ 0x9c - 0x8e ];
+
+  p->par_p9 =                      buf[ 0x9f - 0x8e ];
+  p->par_p9 = ( p->par_p9 << 8 ) | buf[ 0x9e - 0x8e ];
+
+  p->par_p10 =                     buf[ 0xa0 - 0x8e ];
+
+  return result;
+}
+
+void tp( struct pressure* p, const struct temperature* t ) {
+  double var1, var2, var3, compensated;
+
+  var1 = ( (double) t->fine / 2.0 ) - 64000.0;
+  var2 = var1 * var1 * ( (double)p->par_p6 / 131072.0 );
+  var2 = var2 + ( var1 * (double)p->par_p5 * 2.0 );
+  var2 = ( var2 / 4.0 ) + ( (double)p->par_p4 * 65536.0 );
+  var1 = ( ( ( (double)p->par_p3 * var1 * var1 ) / 16384.0 ) + ( (double)p->par_p2 * var1 ) ) / 524288.0;
+  var1 = ( 1.0 + ( var1 / 32768.0 ) ) * (double)p->par_p1;
+  compensated = 1048576.0 - (double)p->raw;
+  compensated = ( ( compensated - ( var2 / 4096.0 ) ) * 6250.0 ) / var1;
+  var1 = ( (double)p->par_p9 * compensated * compensated ) / 2147483648.0;
+  var2 = compensated * ( (double)p->par_p8 / 32768.0 );
+  double div = compensated / 256.0;
+  var3 = div * div * div * ( p->par_p10 / 131072.0 );
+  compensated = compensated + ( var1 + var2 + var3 + ( (double) p->par_p7 * 128.0 ) ) / 16.0;
+
+  printf( "pressure=%d(%f)\n", p->raw, compensated );
+
+}
+
+void compensate_pressure( struct pressure* p, const struct temperature* t ) {
+
+  int32_t var1, var2, var3;
+
+  var1 = ( t->fine >> 1 ) - 64000;
+  var2 = ( ( ( ( var1 >> 2 ) * ( var1 >> 2 ) ) >> 11 ) * p->par_p6 ) >> 2;
+  var2 = var2 + ( ( var1 * p->par_p5 ) << 1 );
+  var2 = ( var2 >> 2 ) + ( p->par_p4 << 16 );
+  var1 = ( ( ( ( ( var1 >> 2 ) * ( var1 >> 2 ) ) >> 13 ) * ( p->par_p3 << 5 ) ) >> 3 ) + ( ( p->par_p2 * var1 ) >> 1 );
+  var1 = var1 >> 18;
+  var1 = ( ( 32768 + var1 ) * p->par_p1 ) >> 15;
+  p->compensated = 1048576 - p->raw;
+  uint32_t comp = (uint32_t)( ( p->compensated - ( var2 >> 12 ) ) * ( (uint32_t) 3125 ) );
+  if ( comp >= ( 1 << 30 ) ) {
+    comp = ( ( comp / (uint32_t)var1 ) << 1 );
+  }
+  else {
+    comp = ( ( comp << 1 ) / (uint32_t)var1 );
+  }
+  var1 = ( p->par_p9 * (int32_t)( ( ( comp >> 3 ) * ( comp >> 3 ) )>> 13 ) ) >> 12;
+  var2 = ( (int32_t)( comp >> 2 ) * p->par_p8 ) >> 13;
+  var3 = ( (int32_t)( comp >> 8 ) * (int32_t)( comp >> 8 ) * (int32_t)( comp >> 8 ) * p->par_p10 ) >> 17;
+  p->compensated = (int32_t)comp + ( ( var1 + var2 + var3 + ( p->par_p7 << 7 ) ) >> 4 );
+
+  //tp( p, t );
+}
+
+struct humidity {
+  int32_t par_h1;
+  int32_t par_h2;
+  int32_t par_h3;
+  int32_t par_h4;
+  int32_t par_h5;
+  int32_t par_h6;
+  int32_t par_h7;
+  int32_t raw;
+  int32_t compensated;
+};
+
+int read_humidity_calibration( int fd_bme680, struct humidity* h ) {
+
+  int result;
+
+  const int32_t size = 1 + ( 0xe8 - 0xe1 );
+  u8 buf[ size ];
+
+  result = read_registers( fd_bme680, 0xe1, buf, size );
+
+  h->par_h1 = buf[ 0xe3 - 0xe1 ];
+  h->par_h1 = ( h->par_h1 << 4 ) | ( buf[ 0xe2 - 0xe1 ] & 0x0f );
+
+  h->par_h2 = buf[ 0xe1 - 0xe1 ];
+  h->par_h2 = ( h->par_h2 << 4 ) | ( buf[ 0xe2 - 0xe1 ] >> 4 );
+
+  h->par_h3 = buf[ 0xe4 - 0xe1 ];
+
+  h->par_h4 = buf[ 0xe5 - 0xe1 ];
+
+  h->par_h5 = buf[ 0xe6 - 0xe1 ];
+
+  h->par_h6 = buf[ 0xe7 - 0xe1 ];
+
+  h->par_h7 = buf[ 0xe8 - 0xe1 ];
+
+  return result;
+
+}
+
+void compensate_humidity( struct humidity* h, const struct temperature* t ) {
+
+  int32_t var1 = h->raw - ( h->par_h1 << 4 ) - ( ( ( t->compensated * h->par_h3 ) / 100 ) >> 1 );
+  int32_t var2
+    = ( h->par_h2 * ( ( ( t->compensated * h->par_h4 ) / 100 )
+    + ( ( ( t->compensated * ( ( t->compensated * h->par_h5 )
+    / 100 ) ) ) >> 6 ) / 100 + ( 1 << 14 ) ) )>> 10;
+  int32_t var3 = var1 * var2;
+  int32_t var4 = ( ( h->par_h6 << 7) + ( ( t->compensated * h->par_h7) / 100) ) >> 4;
+  int32_t var5 = ( (var3 >> 14 ) * ( var3 >> 14 ) ) >> 10;
+  int32_t var6 = ( var4 * var5 ) >> 1;
+  h->compensated = ( ( ( var3 + var6 ) >> 10 ) * 1000 ) >> 12;
+
+}
+
+int measure_pth( int fd_bme680, int32_t* pressure, int32_t* temperature, int32_t* humidity ) {
 
   int result;
   u8 status;
@@ -265,8 +470,8 @@ int measure_pth( int fd_bme680, int* pressure, int* temperature, int* humidity )
   } while ( 0 < ( ( status_measuring | status_measuring_gas ) & status ) );
 
   // initiate a humidity, pressure, temperature measurement
-  result = write_register( fd_bme680, humidity_control, humidity_os_x1 );
-  result = write_register( fd_bme680, ctrl_op_mode, temperature_os_x1 | pressure_os_x1 | op_mode_forced );
+  result = write_register( fd_bme680, humidity_control, humidity_os_x2 );
+  result = write_register( fd_bme680, ctrl_op_mode, temperature_os_x2 | pressure_os_x2 | op_mode_forced );
 
   // wait for any pending measurements to complete
   int loops = 0;
@@ -279,17 +484,17 @@ int measure_pth( int fd_bme680, int* pressure, int* temperature, int* humidity )
 
   if ( 0 < ( status_new_data & status ) ) {
 
-    u8 bufPressure[ 3 ];
-    result = read_registers( fd_bme680, pressure_adc_msb, bufPressure, 3 );
-    *pressure =                        bufPressure[ 0 ];
-    *pressure = ( *pressure << 8 ) |   bufPressure[ 1 ];
-    *pressure = ( *pressure << 4 ) | ( bufPressure[ 2 ] >> 4 );
-
     u8 bufTemperature[ 3 ];
     result = read_registers( fd_bme680, temp_adc_hi, bufTemperature, 3 );
     *temperature =                           bufTemperature[ 0 ];
     *temperature = ( *temperature << 8 ) |   bufTemperature[ 1 ];
     *temperature = ( *temperature << 4 ) | ( bufTemperature[ 2 ] >> 4 );
+
+    u8 bufPressure[ 3 ];
+    result = read_registers( fd_bme680, pressure_adc_msb, bufPressure, 3 );
+    *pressure =                        bufPressure[ 0 ];
+    *pressure = ( *pressure << 8 ) |   bufPressure[ 1 ];
+    *pressure = ( *pressure << 4 ) | ( bufPressure[ 2 ] >> 4 );
 
     u8 bufHumidity[ 2 ];
     result = read_registers( fd_bme680, humidity_adc_msb, bufHumidity, 2 );
@@ -298,7 +503,7 @@ int measure_pth( int fd_bme680, int* pressure, int* temperature, int* humidity )
 
   }
   else {
-    printf( "no data available (0x%02x)", status );
+    printf( "no data available (0x%02x)\n", status );
   }
 
   return result;
@@ -319,16 +524,33 @@ void main() {
 
     result = check_chip_id( fd_bme680 );
 
-    int rawPressure;
-    int rawTemperature;
-    int rawHumidity;
+    if ( 0 < result ) {
 
-    while ( 1 ) {
-      result = measure_pth( fd_bme680, &rawPressure, &rawTemperature, &rawHumidity );
-      printf( "p=%d, t=%d, h=%d\n", rawPressure, rawTemperature, rawHumidity );
-      sleep( 1 );
+      // make sure iir filtering is off
+      result = write_register( fd_bme680, iir_filter_control, 0x00 );
+
+      // temperature seems a bit low by a degree or two
+      // pressure seems high - about 200 or 300 too high
+      // humidity seems low - a bit low by 4 or 5?
+
+      struct temperature t;
+      result = read_temperature_calibration( fd_bme680, &t );
+
+      struct pressure p;
+      result = read_pressure_calibration( fd_bme680, &p );
+
+      struct humidity h;
+      result = read_humidity_calibration( fd_bme680, &h );
+
+      while ( 1 ) {
+        result = measure_pth( fd_bme680, &p.raw, &t.raw, &h.raw );
+        compensate_temperature( &t );
+        compensate_pressure( &p, &t );
+        compensate_humidity( &h, &t );
+        printf( "p=%d(%d), t=%d(%d), h=%d(%d)\n", p.raw, p.compensated, t.raw, t.compensated, h.raw, h.compensated );
+        sleep( 3 );
+      }
     }
-
   }
 
   close( fd_bme680 );
