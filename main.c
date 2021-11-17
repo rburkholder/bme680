@@ -239,6 +239,18 @@ int write_register( int fd, u8 reg, u8 data ) {
 
 }
 
+int read_uint16( int fd, u8 reg, uint16_t* data ) {
+
+  u8 buf[ 2 ];
+
+  int result = read_registers( fd, reg, buf, 2 );
+
+  *data = buf[ 1 ];
+  *data = ( *data << 8 ) | buf[ 0 ];
+
+  return result;
+}
+
 int check_chip_id( int fd_bme680 ) {
 
   u8 data;
@@ -257,9 +269,9 @@ int check_chip_id( int fd_bme680 ) {
 }
 
 struct temperature {
-  int32_t par_t1;
-  int32_t par_t2;
-  int32_t par_t3;
+  uint16_t par_t1;
+  int16_t par_t2;
+  int8_t par_t3;
   int32_t raw;
   int32_t fine; // used in pressure
   int32_t compensated; // _.xx celcius
@@ -269,25 +281,9 @@ int read_temperature_calibration( int fd_bme680, struct temperature* t ) {
 
   int result;
 
-  {
-    u8 buf[ 2 ];
-
-    result = read_registers( fd_bme680, calibration_parm_t1_lsb, buf, 2 );
-
-    t->par_t1 =                      buf[ 1 ];
-    t->par_t1 = ( t->par_t1 << 8 ) | buf[ 0 ];
-  }
-
-  {
-    u8 buf[ 3 ];
-
-    result = read_registers( fd_bme680, calibration_parm_t2_lsb, buf, 3 );
-
-    t->par_t2 =                      buf[ 1 ];
-    t->par_t2 = ( t->par_t2 << 8 ) | buf[ 0 ];
-
-    t->par_t3 = buf[ 2 ];
-  }
+  result = read_uint16(    fd_bme680, calibration_parm_t1_lsb, &t->par_t1 );
+  result = read_uint16(    fd_bme680, calibration_parm_t2_lsb, &t->par_t2 );
+  result = read_register(  fd_bme680, calibration_parm_t3,     &t->par_t3 );
 
   return result;
 }
@@ -300,6 +296,7 @@ void compensate_temperature( struct temperature* t ) {
   int32_t var3 = ( ( ( ( var1 >> 1 ) * ( var1 >> 1 ) ) >> 12 ) * ( t->par_t3 << 4 ) ) >> 14;
   t->fine = var2 + var3;
   t->compensated = ( ( t->fine * 5 ) + 128 ) >> 8;
+
 }
 
 struct pressure {
@@ -325,6 +322,8 @@ int read_pressure_calibration( int fd_bme680, struct pressure* p ) {
   u8 buf[ size ];
 
   result = read_registers( fd_bme680, 0x8e, buf, size );
+
+  // TODO: migrate the following to match temperature calibration acquisition
 
   p->par_p1 =                      buf[ 0x8f - 0x8e ];
   p->par_p1 = ( p->par_p1 << 8 ) | buf[ 0x8e - 0x8e ];
