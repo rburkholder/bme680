@@ -4,23 +4,22 @@
 // started: 2021/11/10
 //
 
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/ioctl.h>
-
 #include <fcntl.h>
+#include <unistd.h>
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
 
-#include <unistd.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <sys/ioctl.h>
 
 #include <linux/i2c.h>
 #include <linux/i2c-dev.h>
 
 /*
-  providees sample code:
+  sample code found at:
   https://elinux.org/Interfacing_with_I2C_Devices
   https://www.kernel.org/doc/html/v5.4/i2c/dev-interface.html
   https://gist.github.com/JamesDunne/9b7fbedb74c22ccc833059623f47beb7
