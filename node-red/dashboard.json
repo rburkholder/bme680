@@ -1,0 +1,468 @@
+[
+    {
+        "id": "dedb609fdca782cf",
+        "type": "tab",
+        "label": "Flow 1",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "9557291f23ca01e7",
+        "type": "mqtt in",
+        "z": "dedb609fdca782cf",
+        "name": "beagle bme680",
+        "topic": "/beagle/bme680",
+        "qos": "1",
+        "datatype": "json",
+        "broker": "bff3027feee406c2",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 240,
+        "y": 500,
+        "wires": [
+            [
+                "7c733756c3720df9"
+            ]
+        ]
+    },
+    {
+        "id": "7c733756c3720df9",
+        "type": "json",
+        "z": "dedb609fdca782cf",
+        "name": "",
+        "property": "payload",
+        "action": "obj",
+        "pretty": false,
+        "x": 410,
+        "y": 500,
+        "wires": [
+            [
+                "5db94252c045ca6f",
+                "7f829694fe0ca107",
+                "086424b45852bcd4"
+            ]
+        ]
+    },
+    {
+        "id": "9b5d47f3633268d8",
+        "type": "ui_gauge",
+        "z": "dedb609fdca782cf",
+        "name": "",
+        "group": "0140d16004fcade8",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Temperature Gauge",
+        "label": "deg Celcius",
+        "format": "{{value}}",
+        "min": "-20",
+        "max": "40",
+        "colors": [
+            "#3584e4",
+            "#2ec27e",
+            "#ca3838"
+        ],
+        "seg1": "20",
+        "seg2": "25",
+        "className": "",
+        "x": 840,
+        "y": 400,
+        "wires": []
+    },
+    {
+        "id": "113969b41039dab8",
+        "type": "ui_gauge",
+        "z": "dedb609fdca782cf",
+        "name": "",
+        "group": "17aa9ac215792b8f",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Pressure Gauge",
+        "label": "millibar",
+        "format": "{{value}}",
+        "min": "500",
+        "max": "1600",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "className": "",
+        "x": 830,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "cea8e001a3fa1ac9",
+        "type": "ui_gauge",
+        "z": "dedb609fdca782cf",
+        "name": "",
+        "group": "9b40f3942ccabeb0",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Humidity Gauge",
+        "label": "%",
+        "format": "{{value}}",
+        "min": 0,
+        "max": "100",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "className": "",
+        "x": 820,
+        "y": 560,
+        "wires": []
+    },
+    {
+        "id": "5db94252c045ca6f",
+        "type": "change",
+        "z": "dedb609fdca782cf",
+        "name": "get temperature",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.values.t",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 640,
+        "y": 420,
+        "wires": [
+            [
+                "9b5d47f3633268d8",
+                "f3c4c0a460ea1fc3"
+            ]
+        ]
+    },
+    {
+        "id": "7f829694fe0ca107",
+        "type": "change",
+        "z": "dedb609fdca782cf",
+        "name": "get pressure",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.values.p",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 630,
+        "y": 500,
+        "wires": [
+            [
+                "113969b41039dab8",
+                "62bfd4481f360e4b"
+            ]
+        ]
+    },
+    {
+        "id": "086424b45852bcd4",
+        "type": "change",
+        "z": "dedb609fdca782cf",
+        "name": "extract humidity",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.values.h",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 640,
+        "y": 580,
+        "wires": [
+            [
+                "cea8e001a3fa1ac9",
+                "b71413c0f13ea0b2"
+            ]
+        ]
+    },
+    {
+        "id": "1c03a7593985e08a",
+        "type": "e-mail",
+        "z": "dedb609fdca782cf",
+        "server": "mail1.oneunified.net",
+        "port": "465",
+        "secure": true,
+        "tls": true,
+        "name": "ray@oneunified.net",
+        "dname": "node-red",
+        "x": 870,
+        "y": 840,
+        "wires": []
+    },
+    {
+        "id": "8cdb38f3401b2461",
+        "type": "trigger",
+        "z": "dedb609fdca782cf",
+        "name": "",
+        "op1": "",
+        "op2": "0",
+        "op1type": "pay",
+        "op2type": "str",
+        "duration": "0",
+        "extend": false,
+        "overrideDelay": false,
+        "units": "ms",
+        "reset": "",
+        "bytopic": "all",
+        "topic": "topic",
+        "outputs": 1,
+        "x": 650,
+        "y": 840,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "aa63d71224ed77fd",
+        "type": "rbe",
+        "z": "dedb609fdca782cf",
+        "name": "",
+        "func": "deadbandEq",
+        "gap": "",
+        "start": "",
+        "inout": "out",
+        "septopics": true,
+        "property": "payload",
+        "topi": "topic",
+        "x": 390,
+        "y": 840,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "f3c4c0a460ea1fc3",
+        "type": "ui_chart",
+        "z": "dedb609fdca782cf",
+        "name": "",
+        "group": "0140d16004fcade8",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "label": "Temperature",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "-30",
+        "ymax": "40",
+        "removeOlder": "3",
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 810,
+        "y": 440,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "62bfd4481f360e4b",
+        "type": "ui_chart",
+        "z": "dedb609fdca782cf",
+        "name": "",
+        "group": "17aa9ac215792b8f",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "label": "Pressure",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "500",
+        "ymax": "1500",
+        "removeOlder": "3",
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 800,
+        "y": 520,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "b71413c0f13ea0b2",
+        "type": "ui_chart",
+        "z": "dedb609fdca782cf",
+        "name": "",
+        "group": "9b40f3942ccabeb0",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "label": "Humidity",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "0",
+        "ymax": "100",
+        "removeOlder": "3",
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 800,
+        "y": 600,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "bff3027feee406c2",
+        "type": "mqtt-broker",
+        "name": "rbtmq01.duchess.burkholder.net",
+        "broker": "rbtmq01.duchess.burkholder.net",
+        "port": "1883",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "0140d16004fcade8",
+        "type": "ui_group",
+        "name": "Temperature",
+        "tab": "b109790f8d19682e",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "17aa9ac215792b8f",
+        "type": "ui_group",
+        "name": "Pressure",
+        "tab": "b109790f8d19682e",
+        "order": 2,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "9b40f3942ccabeb0",
+        "type": "ui_group",
+        "name": "Humidity",
+        "tab": "b109790f8d19682e",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "b109790f8d19682e",
+        "type": "ui_tab",
+        "name": "Home",
+        "icon": "BeagleBoard",
+        "disabled": false,
+        "hidden": false
+    }
+]
