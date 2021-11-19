@@ -54,7 +54,12 @@ void main() {
         compensate_temperature( &t );
         compensate_pressure( &p, &t );
         compensate_humidity( &h, &t );
-        printf( "p=%d(%d), t=%d(%d), h=%d(%d)\n", p.raw, p.compensated, t.raw, t.compensated, h.raw, h.compensated );
+        printf( 
+          "p=%d(%0.2f) mbar, t=%d(%0.2f) degC, h=%d(%0.3f)%\n", 
+          p.raw, ( (double)p.compensated / 100.0 ), 
+          t.raw, ( (double)t.compensated / 100.0 ), 
+          h.raw, ( (double)h.compensated / 1000.0 ) 
+          );
         sleep( 3 );
       }
     }
