@@ -4,6 +4,7 @@
 // started: 2021/11/10
 //
 
+
 #include <fcntl.h>
 #include <unistd.h>
 
@@ -11,11 +12,21 @@
 #include <stdlib.h>
 #include <stdint.h>
 
+#include <string.h>
+
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/ioctl.h>
 
+#include <MQTTClient.h>
+
 #include "bme680.h"
+
+#define ADDRESS     "tcp://rbtmq01.duchess.burkholder.net:1883"
+#define CLIENTID    "bb01" // convert to command line
+#define TOPIC       "/beagle/bme680"
+#define QOS         1
+#define TIMEOUT     10000L
 
 void main() {
 
@@ -25,6 +36,33 @@ void main() {
   int fd_bme680; /* file descripter for device when opened */
 
   fd_bme680 = open_i2c_device( i2c_id_bus, i2c_addr_bme680 );
+
+  MQTTClient client;
+  MQTTClient_connectOptions conn_opts = MQTTClient_connectOptions_initializer;
+  MQTTClient_message pubmsg = MQTTClient_message_initializer;
+  MQTTClient_deliveryToken token;
+  int rc;
+
+  if ((rc = MQTTClient_create(
+    &client, ADDRESS, CLIENTID,
+    MQTTCLIENT_PERSISTENCE_NONE, NULL)) != MQTTCLIENT_SUCCESS) {
+     printf("Failed to create client, return code %d\n", rc);
+     exit(EXIT_FAILURE);
+  }
+
+  conn_opts.keepAliveInterval = 20;
+  conn_opts.cleansession = 1;
+  conn_opts.username = "beagle";  // convert to command line
+  conn_opts.password = "beagle";  // convert to command line
+  if ((rc = MQTTClient_connect(client, &conn_opts)) != MQTTCLIENT_SUCCESS) {
+    printf("Failed to connect, return code %d\n", rc);
+    exit(EXIT_FAILURE);
+  }
+
+  #define max_buf_size 500
+  char szTopic[ max_buf_size ];
+  char szMessage[ max_buf_size ];
+
   if ( 0 <= fd_bme680 ) {
 
     int result;
@@ -54,18 +92,78 @@ void main() {
         compensate_temperature( &t );
         compensate_pressure( &p, &t );
         compensate_humidity( &h, &t );
+
+        double temperature = (double)t.compensated / 100.0;
+        double pressure    = (double)p.compensated / 100.0;
+        double humidity    = (double)h.compensated / 1000.0;
+
         printf( 
           "p=%d(%0.2f) mbar, t=%d(%0.2f) degC, h=%d(%0.3f)%\n", 
-          p.raw, ( (double)p.compensated / 100.0 ), 
-          t.raw, ( (double)t.compensated / 100.0 ), 
-          h.raw, ( (double)h.compensated / 1000.0 ) 
+          p.raw, pressure,
+          t.raw, temperature,
+          h.raw, humidity
           );
+
+        int sizeTopic, sizeMessage;
+
+        sizeTopic = snprintf( szTopic, max_buf_size, "%s/%s/temperature", TOPIC, CLIENTID );
+        sizeMessage = snprintf( szMessage, max_buf_size, "%0.2f", temperature );
+
+        pubmsg.payload = szMessage;
+        pubmsg.payloadlen = sizeMessage;
+        pubmsg.qos = QOS;
+        pubmsg.retained = 0;
+        if ( (rc = MQTTClient_publishMessage(client, szTopic, &pubmsg, &token)) != MQTTCLIENT_SUCCESS) {
+          printf("Failed to publish message, return code %d\n", rc);
+        }
+        else {
+          rc = MQTTClient_waitForCompletion(client, token, TIMEOUT);
+          printf("Message %d: %s=%s delivered\n", token, szTopic, szMessage );
+        }
+
+        sizeTopic = snprintf( szTopic, max_buf_size, "%s/%s/pressure", TOPIC, CLIENTID );
+        sizeMessage = snprintf( szMessage, max_buf_size, "%0.2f", pressure );
+
+        pubmsg.payload = szMessage;
+        pubmsg.payloadlen = sizeMessage;
+        pubmsg.qos = QOS;
+        pubmsg.retained = 0;
+        if ( (rc = MQTTClient_publishMessage(client, szTopic, &pubmsg, &token)) != MQTTCLIENT_SUCCESS) {
+          printf("Failed to publish message, return code %d\n", rc);
+        }
+        else {
+          rc = MQTTClient_waitForCompletion(client, token, TIMEOUT);
+          printf("Message %d: %s=%s delivered\n", token, szTopic, szMessage );
+        }
+
+        sizeTopic = snprintf( szTopic, max_buf_size, "%s/%s/humidity", TOPIC, CLIENTID );
+        sizeMessage = snprintf( szMessage, max_buf_size, "%0.3f", humidity );
+
+        pubmsg.payload = szMessage;
+        pubmsg.payloadlen = sizeMessage;
+        pubmsg.qos = QOS;
+        pubmsg.retained = 0;
+        if ( (rc = MQTTClient_publishMessage(client, szTopic, &pubmsg, &token)) != MQTTCLIENT_SUCCESS) {
+          printf("Failed to publish message, return code %d\n", rc);
+        }
+        else {
+          rc = MQTTClient_waitForCompletion(client, token, TIMEOUT);
+          printf("Message %d: %s=%s delivered\n", token, szTopic, szMessage );
+        }
+
+        printf( "\n" );
+
         sleep( 3 );
       }
     }
   }
 
   close( fd_bme680 );
+
+  if ((rc = MQTTClient_disconnect(client, 10000)) != MQTTCLIENT_SUCCESS)
+    printf("Failed to disconnect, return code %d\n", rc);
+  MQTTClient_destroy(&client);
+
   printf( "done\n" );
 }
 

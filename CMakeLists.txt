@@ -19,7 +19,7 @@ add_executable(
     ${file_c}
   )
 
-#target_link_libraries(
-#  ${PROJECT_NAME}
-#    bme680
-#  )
+target_link_libraries(
+  ${PROJECT_NAME}
+  paho-mqtt3c
+  )
