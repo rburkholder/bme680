@@ -147,12 +147,12 @@ void main( int argc, char *argv[] ) {
         }
         else {
           rc = MQTTClient_waitForCompletion(client, token, TIMEOUT);
-          printf("Message %d: %s=%s delivered\n", token, szTopic, szMessage );
+          printf("Message %d: %s=%s\n", token, szTopic, szMessage );
         }
 
         printf( "\n" );
 
-        sleep( 5 );
+        sleep( 20 );
       }
     }
   }
