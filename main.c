@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 
+#include <time.h>
 #include <string.h>
 
 #include <sys/stat.h>
@@ -60,7 +61,6 @@ void main() {
   }
 
   #define max_buf_size 500
-  char szTopic[ max_buf_size ];
   char szMessage[ max_buf_size ];
 
   if ( 0 <= fd_bme680 ) {
@@ -87,7 +87,24 @@ void main() {
       struct humidity h;
       result = read_humidity_calibration( fd_bme680, &h );
 
+      time_t now;
+      struct tm timeinfo;
+      unsigned char szTimeInfo[ 50 ];
+      const unsigned char szTopic[] = "/beagle/bme680";
+
       while ( 1 ) {
+
+        // Get current time and publish it
+        time( &now );
+        localtime_r( &now, &timeinfo );
+        sprintf( szTimeInfo, "%04d-%02d-%02d %02d:%02d:%02d",
+          timeinfo.tm_year + 1900,
+          timeinfo.tm_mon + 1,
+          timeinfo.tm_mday,
+          timeinfo.tm_hour,
+          timeinfo.tm_min,
+          timeinfo.tm_sec);
+
         result = measure_pth( fd_bme680, &p.raw, &t.raw, &h.raw );
         compensate_temperature( &t );
         compensate_pressure( &p, &t );
@@ -104,40 +121,13 @@ void main() {
           h.raw, humidity
           );
 
-        int sizeTopic, sizeMessage;
+        int sizeMessage;
 
-        sizeTopic = snprintf( szTopic, max_buf_size, "%s/%s/temperature", TOPIC, CLIENTID );
-        sizeMessage = snprintf( szMessage, max_buf_size, "%0.2f", temperature );
-
-        pubmsg.payload = szMessage;
-        pubmsg.payloadlen = sizeMessage;
-        pubmsg.qos = QOS;
-        pubmsg.retained = 0;
-        if ( (rc = MQTTClient_publishMessage(client, szTopic, &pubmsg, &token)) != MQTTCLIENT_SUCCESS) {
-          printf("Failed to publish message, return code %d\n", rc);
-        }
-        else {
-          rc = MQTTClient_waitForCompletion(client, token, TIMEOUT);
-          printf("Message %d: %s=%s delivered\n", token, szTopic, szMessage );
-        }
-
-        sizeTopic = snprintf( szTopic, max_buf_size, "%s/%s/pressure", TOPIC, CLIENTID );
-        sizeMessage = snprintf( szMessage, max_buf_size, "%0.2f", pressure );
-
-        pubmsg.payload = szMessage;
-        pubmsg.payloadlen = sizeMessage;
-        pubmsg.qos = QOS;
-        pubmsg.retained = 0;
-        if ( (rc = MQTTClient_publishMessage(client, szTopic, &pubmsg, &token)) != MQTTCLIENT_SUCCESS) {
-          printf("Failed to publish message, return code %d\n", rc);
-        }
-        else {
-          rc = MQTTClient_waitForCompletion(client, token, TIMEOUT);
-          printf("Message %d: %s=%s delivered\n", token, szTopic, szMessage );
-        }
-
-        sizeTopic = snprintf( szTopic, max_buf_size, "%s/%s/humidity", TOPIC, CLIENTID );
-        sizeMessage = snprintf( szMessage, max_buf_size, "%0.3f", humidity );
+        sizeMessage = snprintf(
+          szMessage, max_buf_size,
+          "{\"device\":\"%s\",\"values\":{\"ti\":\"%s\",\"t\":%0.2f,\"p\":%0.2f,\"h\":%0.3f}}",
+          CLIENTID, szTimeInfo, temperature, pressure, humidity
+          );
 
         pubmsg.payload = szMessage;
         pubmsg.payloadlen = sizeMessage;
@@ -153,7 +143,7 @@ void main() {
 
         printf( "\n" );
 
-        sleep( 3 );
+        sleep( 5 );
       }
     }
   }
