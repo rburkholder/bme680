@@ -9,6 +9,7 @@ set(
 
 set(
   file_c
+    bme680.c
     main.c
   )
 
@@ -18,4 +19,7 @@ add_executable(
     ${file_c}
   )
 
-
+#target_link_libraries(
+#  ${PROJECT_NAME}
+#    bme680
+#  )
