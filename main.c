@@ -19,17 +19,27 @@
 #include <sys/types.h>
 #include <sys/ioctl.h>
 
+#include <limits.h>
+
 #include <MQTTClient.h>
 
 #include "bme680.h"
 
 #define ADDRESS     "tcp://rbtmq01.duchess.burkholder.net:1883"
-#define CLIENTID    "bb01" // convert to command line
 #define TOPIC       "/beagle/bme680"
 #define QOS         1
-#define TIMEOUT     10000L
+#define TIMEOUT     1000L
 
-void main() {
+void main( int argc, char *argv[] ) {
+
+  int rc;
+
+  char szHostName[ HOST_NAME_MAX + 1 ];
+  rc = gethostname( szHostName, HOST_NAME_MAX + 1 );
+  if ( 0 != rc ) {
+    printf( "failure with gethostname\n" );
+    exit( EXIT_FAILURE );
+  }
 
   int i2c_id_bus = 2; /* seeed beagleboard green bus number */
   u8  i2c_addr_bme680 = 0x76; /* seeed bme680 board */
@@ -42,11 +52,10 @@ void main() {
   MQTTClient_connectOptions conn_opts = MQTTClient_connectOptions_initializer;
   MQTTClient_message pubmsg = MQTTClient_message_initializer;
   MQTTClient_deliveryToken token;
-  int rc;
 
-  if ((rc = MQTTClient_create(
-    &client, ADDRESS, CLIENTID,
-    MQTTCLIENT_PERSISTENCE_NONE, NULL)) != MQTTCLIENT_SUCCESS) {
+  if ( ( rc = MQTTClient_create(
+    &client, ADDRESS, szHostName,
+    MQTTCLIENT_PERSISTENCE_NONE, NULL) ) != MQTTCLIENT_SUCCESS) {
      printf("Failed to create client, return code %d\n", rc);
      exit(EXIT_FAILURE);
   }
@@ -126,7 +135,7 @@ void main() {
         sizeMessage = snprintf(
           szMessage, max_buf_size,
           "{\"device\":\"%s\",\"values\":{\"ti\":\"%s\",\"t\":%0.2f,\"p\":%0.2f,\"h\":%0.3f}}",
-          CLIENTID, szTimeInfo, temperature, pressure, humidity
+          szHostName, szTimeInfo, temperature, pressure, humidity
           );
 
         pubmsg.payload = szMessage;
