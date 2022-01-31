@@ -173,6 +173,8 @@ int write_register( int fd, u8 reg, u8 data );
 
 int read_uint16( int fd, u8 reg, uint16_t* data );
 
+int read_int16( int fd, u8 reg, int16_t* data );
+
 int check_chip_id( int fd_bme680 );
 
 struct temperature {

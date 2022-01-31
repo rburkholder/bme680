@@ -106,6 +106,23 @@ int write_register( int fd, u8 reg, u8 data ) {
 
 }
 
+int read_int16( int fd, u8 reg, int16_t* data ) {
+
+  u8 buf[ 2 ];
+
+  int result = read_registers( fd, reg, buf, 2 );
+
+  //*data = buf[ 1 ];
+  //*data = ( *data << 8 ) | buf[ 0 ];
+
+  *data = ( (int16_t)buf[ 1 ] << 8 ) | (int16_t)buf[ 0 ];
+
+  //data[ 0 ] = buf[ 1 ];
+  //data[ 1 ] = buf[ 0 ];
+
+  return result;
+}
+
 int read_uint16( int fd, u8 reg, uint16_t* data ) {
 
   u8 buf[ 2 ];
@@ -140,7 +157,7 @@ int read_temperature_calibration( int fd_bme680, struct temperature* t ) {
   int result;
 
   result = read_uint16(    fd_bme680, calibration_parm_t1_lsb, &t->par_t1 );
-  result = read_uint16(    fd_bme680, calibration_parm_t2_lsb, &t->par_t2 );
+  result = read_int16(    fd_bme680, calibration_parm_t2_lsb, &t->par_t2 );
   result = read_register(  fd_bme680, calibration_parm_t3,     &t->par_t3 );
 
   return result;
@@ -149,9 +166,9 @@ int read_temperature_calibration( int fd_bme680, struct temperature* t ) {
 void compensate_temperature( struct temperature* t ) {
 
   // it is interesting to note that the lower 3 bits of the raw temperature are thrown away
-  int32_t var1 = ( t->raw >> 3 ) - ( t->par_t1 << 1 );
-  int32_t var2 = ( var1 * t->par_t2 ) >> 11;
-  int32_t var3 = ( ( ( ( var1 >> 1 ) * ( var1 >> 1 ) ) >> 12 ) * ( t->par_t3 << 4 ) ) >> 14;
+  int32_t var1 = ( t->raw >> 3 ) - ( (int32_t)t->par_t1 << 1 );
+  int32_t var2 = ( var1 * (int32_t)t->par_t2 ) >> 11;
+  int32_t var3 = ( ( ( ( var1 >> 1 ) * ( var1 >> 1 ) ) >> 12 ) * ( (int32_t)t->par_t3 << 4 ) ) >> 14;
   t->fine = var2 + var3;
   t->compensated = ( ( t->fine * 5 ) + 128 ) >> 8;
 
