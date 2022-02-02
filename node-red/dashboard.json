@@ -1,21 +1,5 @@
 [
     {
-        "id": "dedb609fdca782cf",
-        "type": "tab",
-        "label": "BeagleBoard Sensors",
-        "disabled": false,
-        "info": "",
-        "env": []
-    },
-    {
-        "id": "43040e6c5dd4a8ae",
-        "type": "tab",
-        "label": "Each BeagleBoard",
-        "disabled": false,
-        "info": "",
-        "env": []
-    },
-    {
         "id": "668e86253d2aaf14",
         "type": "subflow",
         "name": "Temperature Alarms",
@@ -36,170 +20,6 @@
         "env": [],
         "meta": {},
         "color": "#DDAA99"
-    },
-    {
-        "id": "bff3027feee406c2",
-        "type": "mqtt-broker",
-        "name": "rbtmq01.duchess.burkholder.net",
-        "broker": "rbtmq01.duchess.burkholder.net",
-        "port": "1883",
-        "clientid": "",
-        "autoConnect": true,
-        "usetls": false,
-        "protocolVersion": "4",
-        "keepalive": "60",
-        "cleansession": true,
-        "birthTopic": "",
-        "birthQos": "0",
-        "birthPayload": "",
-        "birthMsg": {},
-        "closeTopic": "",
-        "closeQos": "0",
-        "closePayload": "",
-        "closeMsg": {},
-        "willTopic": "",
-        "willQos": "0",
-        "willPayload": "",
-        "willMsg": {},
-        "sessionExpiry": ""
-    },
-    {
-        "id": "b109790f8d19682e",
-        "type": "ui_tab",
-        "name": "Home",
-        "icon": "BeagleBoard",
-        "disabled": false,
-        "hidden": false
-    },
-    {
-        "id": "af0a356f177c5d36",
-        "type": "ui_base",
-        "theme": {
-            "name": "theme-light",
-            "lightTheme": {
-                "default": "#0094CE",
-                "baseColor": "#0094CE",
-                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif",
-                "edited": true,
-                "reset": false
-            },
-            "darkTheme": {
-                "default": "#097479",
-                "baseColor": "#097479",
-                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif",
-                "edited": false
-            },
-            "customTheme": {
-                "name": "Untitled Theme 1",
-                "default": "#4B7930",
-                "baseColor": "#4B7930",
-                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif"
-            },
-            "themeState": {
-                "base-color": {
-                    "default": "#0094CE",
-                    "value": "#0094CE",
-                    "edited": false
-                },
-                "page-titlebar-backgroundColor": {
-                    "value": "#0094CE",
-                    "edited": false
-                },
-                "page-backgroundColor": {
-                    "value": "#fafafa",
-                    "edited": false
-                },
-                "page-sidebar-backgroundColor": {
-                    "value": "#ffffff",
-                    "edited": false
-                },
-                "group-textColor": {
-                    "value": "#1bbfff",
-                    "edited": false
-                },
-                "group-borderColor": {
-                    "value": "#ffffff",
-                    "edited": false
-                },
-                "group-backgroundColor": {
-                    "value": "#ffffff",
-                    "edited": false
-                },
-                "widget-textColor": {
-                    "value": "#111111",
-                    "edited": false
-                },
-                "widget-backgroundColor": {
-                    "value": "#0094ce",
-                    "edited": false
-                },
-                "widget-borderColor": {
-                    "value": "#ffffff",
-                    "edited": false
-                },
-                "base-font": {
-                    "value": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif"
-                }
-            },
-            "angularTheme": {
-                "primary": "indigo",
-                "accents": "blue",
-                "warn": "red",
-                "background": "grey",
-                "palette": "light"
-            }
-        },
-        "site": {
-            "name": "BeagleBoard",
-            "hideToolbar": "false",
-            "allowSwipe": "false",
-            "lockMenu": "false",
-            "allowTempTheme": "true",
-            "dateFormat": "DD/MM/YYYY",
-            "sizes": {
-                "sx": 48,
-                "sy": 48,
-                "gx": 6,
-                "gy": 6,
-                "cx": 6,
-                "cy": 6,
-                "px": 0,
-                "py": 0
-            }
-        }
-    },
-    {
-        "id": "0140d16004fcade8",
-        "type": "ui_group",
-        "name": "Temperature",
-        "tab": "b109790f8d19682e",
-        "order": 1,
-        "disp": true,
-        "width": "6",
-        "collapse": false,
-        "className": ""
-    },
-    {
-        "id": "17aa9ac215792b8f",
-        "type": "ui_group",
-        "name": "Pressure",
-        "tab": "b109790f8d19682e",
-        "order": 2,
-        "disp": true,
-        "width": "6",
-        "collapse": false,
-        "className": ""
-    },
-    {
-        "id": "9b40f3942ccabeb0",
-        "type": "ui_group",
-        "name": "Humidity",
-        "tab": "b109790f8d19682e",
-        "order": 3,
-        "disp": true,
-        "width": "6",
-        "collapse": false,
-        "className": ""
     },
     {
         "id": "7380376bfdd30698",
@@ -234,6 +54,14 @@
         "y": 200,
         "wires": [],
         "info": "These need to be set prior to start node-red from the ocmmand line\n\n$(EMAIL_USER)\n$(EMAIL_PWD)\n\n"
+    },
+    {
+        "id": "dedb609fdca782cf",
+        "type": "tab",
+        "label": "BeagleBoard Sensors",
+        "disabled": false,
+        "info": "",
+        "env": []
     },
     {
         "id": "9557291f23ca01e7",
@@ -373,8 +201,8 @@
         "title": "bb02 Pressure Gauge",
         "label": "millibar",
         "format": "{{value}}",
-        "min": "500",
-        "max": "2000",
+        "min": "850",
+        "max": "1050",
         "colors": [
             "#00b500",
             "#e6e600",
@@ -558,8 +386,8 @@
         "interpolate": "linear",
         "nodata": "",
         "dot": false,
-        "ymin": "500",
-        "ymax": "2000",
+        "ymin": "850",
+        "ymax": "1050",
         "removeOlder": "6",
         "removeOlderPoints": "1000",
         "removeOlderUnit": "3600",
@@ -670,8 +498,8 @@
         "title": "bb03 Pressure Gauge",
         "label": "millibar",
         "format": "{{value}}",
-        "min": "500",
-        "max": "2000",
+        "min": "850",
+        "max": "1050",
         "colors": [
             "#00b500",
             "#e6e600",
@@ -855,8 +683,8 @@
         "interpolate": "linear",
         "nodata": "",
         "dot": false,
-        "ymin": "500",
-        "ymax": "2000",
+        "ymin": "850",
+        "ymax": "1050",
         "removeOlder": "6",
         "removeOlderPoints": "1000",
         "removeOlderUnit": "3600",
@@ -967,8 +795,8 @@
         "title": "bb04 Pressure Gauge",
         "label": "millibar",
         "format": "{{value}}",
-        "min": "500",
-        "max": "2000",
+        "min": "850",
+        "max": "1050",
         "colors": [
             "#00b500",
             "#e6e600",
@@ -1152,8 +980,8 @@
         "interpolate": "linear",
         "nodata": "",
         "dot": false,
-        "ymin": "500",
-        "ymax": "2000",
+        "ymin": "850",
+        "ymax": "1050",
         "removeOlder": "6",
         "removeOlderPoints": "1000",
         "removeOlderUnit": "3600",
@@ -1335,8 +1163,8 @@
         "title": "bb01 Pressure Gauge",
         "label": "millibar",
         "format": "{{value}}",
-        "min": "500",
-        "max": "2000",
+        "min": "850",
+        "max": "1050",
         "colors": [
             "#00b500",
             "#e6e600",
@@ -1365,8 +1193,8 @@
         "interpolate": "linear",
         "nodata": "",
         "dot": false,
-        "ymin": "500",
-        "ymax": "2000",
+        "ymin": "850",
+        "ymax": "1050",
         "removeOlder": "6",
         "removeOlderPoints": "1000",
         "removeOlderUnit": "3600",
@@ -1557,5 +1385,72 @@
         "x": 550,
         "y": 300,
         "wires": []
+    },
+    {
+        "id": "bff3027feee406c2",
+        "type": "mqtt-broker",
+        "name": "rbtmq01.duchess.burkholder.net",
+        "broker": "rbtmq01.duchess.burkholder.net",
+        "port": "1883",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "0140d16004fcade8",
+        "type": "ui_group",
+        "name": "Temperature",
+        "tab": "b109790f8d19682e",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "17aa9ac215792b8f",
+        "type": "ui_group",
+        "name": "Pressure",
+        "tab": "b109790f8d19682e",
+        "order": 2,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "9b40f3942ccabeb0",
+        "type": "ui_group",
+        "name": "Humidity",
+        "tab": "b109790f8d19682e",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "b109790f8d19682e",
+        "type": "ui_tab",
+        "name": "Home",
+        "icon": "BeagleBoard",
+        "disabled": false,
+        "hidden": false
     }
 ]
