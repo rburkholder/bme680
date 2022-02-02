@@ -211,6 +211,8 @@ void comp_pres_dbl( struct pressure* p, const struct temperature* t ) {
 
 void compensate_pressure( struct pressure* p, const struct temperature* t ) {
 
+  static const int32_t pres_ovf_check = INT32_C(0x40000000);
+
   int32_t var1, var2, var3;
 
   var1 = ( t->fine >> 1 ) - 64000;
@@ -222,7 +224,6 @@ void compensate_pressure( struct pressure* p, const struct temperature* t ) {
   var1 = ( ( 32768 + var1 ) * p->par_p1 ) >> 15;
   p->compensated = (uint32_t)1048576 - p->raw;
   int32_t comp = ( p->compensated - ( var2 >> 12 ) ) * ( (int32_t) 3125 );
-  const int32_t pres_ovf_check = INT32_C(0x40000000);
   if ( comp >= pres_ovf_check ) {
     comp = ( ( comp / var1 ) << 1 );
   }
@@ -241,26 +242,19 @@ int read_humidity_calibration( int fd_bme680, struct humidity* h ) {
 
   int result;
 
-  const int32_t size = 1 + ( 0xe8 - 0xe1 );
-  u8 buf[ size ];
+  uint8_t e1, e2, e3;
 
-  result = read_registers( fd_bme680, 0xe1, buf, size );
+  result = read_register( fd_bme680, calibration_parm_h2_msb, &e1 );
+  result = read_register( fd_bme680, calibration_parm_h1_lsb, &e2 );
+  result = read_register( fd_bme680, calibration_parm_h1_msb, &e3 );
+  result = read_register( fd_bme680, calibration_parm_h3, &h->par_h3 );
+  result = read_register( fd_bme680, calibration_parm_h4, &h->par_h4 );
+  result = read_register( fd_bme680, calibration_parm_h5, &h->par_h5 );
+  result = read_register( fd_bme680, calibration_parm_h6, &h->par_h6 );
+  result = read_register( fd_bme680, calibration_parm_h7, &h->par_h7 );
 
-  h->par_h1 = buf[ 0xe3 - 0xe1 ];
-  h->par_h1 = ( h->par_h1 << 4 ) | ( buf[ 0xe2 - 0xe1 ] & 0x0f );
-
-  h->par_h2 = buf[ 0xe1 - 0xe1 ];
-  h->par_h2 = ( h->par_h2 << 4 ) | ( buf[ 0xe2 - 0xe1 ] >> 4 );
-
-  h->par_h3 = buf[ 0xe4 - 0xe1 ];
-
-  h->par_h4 = buf[ 0xe5 - 0xe1 ];
-
-  h->par_h5 = buf[ 0xe6 - 0xe1 ];
-
-  h->par_h6 = buf[ 0xe7 - 0xe1 ];
-
-  h->par_h7 = buf[ 0xe8 - 0xe1 ];
+  h->par_h1 = ( e3 << 4 ) | ( e2 & 0x0f );
+  h->par_h2 = ( e1 << 4 ) | ( e2 >> 4 );
 
   return result;
 
@@ -314,9 +308,9 @@ int measure_pth( int fd_bme680, int32_t* temperature, int32_t* pressure, int32_t
 
     u8 bufPressure[ 3 ];
     result = read_registers( fd_bme680, pressure_adc_msb, bufPressure, 3 );
-    *pressure =                        bufPressure[ 0 ];
-    *pressure = ( *pressure << 8 ) |   bufPressure[ 1 ];
-    *pressure = ( *pressure << 4 ) | ( bufPressure[ 2 ] >> 4 );
+    *pressure =                          bufPressure[ 0 ];
+    *pressure = ( *pressure << 8 ) |     bufPressure[ 1 ];
+    *pressure = ( *pressure << 4 ) | ( ( bufPressure[ 2 ] >> 4 ) & 0x0f );
 
     u8 bufHumidity[ 2 ];
     result = read_registers( fd_bme680, humidity_adc_msb, bufHumidity, 2 );

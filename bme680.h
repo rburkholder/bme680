@@ -212,13 +212,13 @@ void tp( struct pressure* p, const struct temperature* t );
 void compensate_pressure( struct pressure* p, const struct temperature* t );
 
 struct humidity {
-  int32_t par_h1;
-  int32_t par_h2;
-  int32_t par_h3;
-  int32_t par_h4;
-  int32_t par_h5;
-  int32_t par_h6;
-  int32_t par_h7;
+  uint16_t par_h1;
+  uint16_t par_h2;
+  uint8_t par_h3;
+  uint8_t par_h4;
+  uint8_t par_h5;
+  uint8_t par_h6;
+  uint8_t par_h7;
   uint32_t raw;
   int32_t compensated;
 };
