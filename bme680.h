@@ -202,7 +202,7 @@ struct pressure {
   uint16_t par_p9;
   uint8_t  par_p10;
   int32_t  raw;
-  uint32_t compensated; // pascal
+  int32_t compensated; // pascal
 };
 
 int read_pressure_calibration( int fd_bme680, struct pressure* p );
@@ -219,7 +219,7 @@ struct humidity {
   int32_t par_h5;
   int32_t par_h6;
   int32_t par_h7;
-  int32_t raw;
+  uint32_t raw;
   int32_t compensated;
 };
 
