@@ -13,3 +13,12 @@ cmake ..
 cmake --build . --config Debug
 # cmake --build . --config Release   # alternate build flavour
 
+
+2022/02/01 - revised instructions
+cd build
+cmake -DCMAKE_BUILD_TYPE=Debug ..
+make
+
+cd build
+cmake -DCMAKE_BUILD_TYPE=Release ..
+make
