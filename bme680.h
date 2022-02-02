@@ -169,6 +169,10 @@ int read_registers( int fd, u8 reg, u8* data, int length );
 
 int read_register( int fd, u8 reg, u8* data );
 
+int read_register_u8( int fd, u8 reg, uint8_t* data );
+
+int read_register_i8( int fd, u8 reg, int8_t* data );
+
 int write_register( int fd, u8 reg, u8 data );
 
 int read_uint16( int fd, u8 reg, uint16_t* data );
@@ -181,7 +185,7 @@ struct temperature {
   uint16_t par_t1;
   int16_t par_t2;
   int8_t par_t3;
-  int32_t raw;
+  uint32_t raw;
   int32_t fine; // used in pressure
   int32_t compensated; // _.xx celcius
 };
@@ -192,16 +196,16 @@ void compensate_temperature( struct temperature* t );
 
 struct pressure {
   uint16_t par_p1;
-  uint16_t par_p2;
-  uint8_t  par_p3;
-  uint16_t par_p4;
-  uint16_t par_p5;
-  uint8_t  par_p6;
-  uint8_t  par_p7;
-  uint16_t par_p8;
-  uint16_t par_p9;
+  int16_t par_p2;
+  int8_t  par_p3;
+  int16_t par_p4;
+  int16_t par_p5;
+  int8_t  par_p6;
+  int8_t  par_p7;
+  int16_t par_p8;
+  int16_t par_p9;
   uint8_t  par_p10;
-  int32_t  raw;
+  uint32_t  raw;
   int32_t compensated; // pascal
 };
 
@@ -214,11 +218,11 @@ void compensate_pressure( struct pressure* p, const struct temperature* t );
 struct humidity {
   uint16_t par_h1;
   uint16_t par_h2;
-  uint8_t par_h3;
-  uint8_t par_h4;
-  uint8_t par_h5;
+  int8_t par_h3;
+  int8_t par_h4;
+  int8_t par_h5;
   uint8_t par_h6;
-  uint8_t par_h7;
+  int8_t par_h7;
   uint32_t raw;
   int32_t compensated;
 };
