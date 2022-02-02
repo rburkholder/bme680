@@ -211,31 +211,45 @@ void comp_pres_dbl( struct pressure* p, const struct temperature* t ) {
 
 void compensate_pressure( struct pressure* p, const struct temperature* t ) {
 
-  static const int32_t pres_ovf_check = INT32_C(0x40000000);
+    int32_t var1;
+    int32_t var2;
+    int32_t var3;
+    int32_t pressure_comp;
 
-  int32_t var1, var2, var3;
+    /* This value is used to check precedence to multiplication or division
+ *      * in the pressure compensation equation to achieve least loss of precision and
+ *           * avoiding overflows.
+ *                * i.e Comparing value, pres_ovf_check = (1 << 31) >> 1
+ *                     */
+    const int32_t pres_ovf_check = INT32_C(0x40000000);
 
-  var1 = ( t->fine >> 1 ) - 64000;
-  var2 = ( ( ( ( var1 >> 2 ) * ( var1 >> 2 ) ) >> 11 ) * p->par_p6 ) >> 2;
-  var2 = var2 + ( ( var1 * p->par_p5 ) << 1 );
-  var2 = ( var2 >> 2 ) + ( p->par_p4 << 16 );
-  var1 = ( ( ( ( ( var1 >> 2 ) * ( var1 >> 2 ) ) >> 13 ) * ( p->par_p3 << 5 ) ) >> 3 ) + ( ( p->par_p2 * var1 ) >> 1 );
-  var1 = var1 >> 18;
-  var1 = ( ( 32768 + var1 ) * p->par_p1 ) >> 15;
-  p->compensated = (uint32_t)1048576 - p->raw;
-  int32_t comp = ( p->compensated - ( var2 >> 12 ) ) * ( (int32_t) 3125 );
-  if ( comp >= pres_ovf_check ) {
-    comp = ( ( comp / var1 ) << 1 );
-  }
-  else {
-    comp = ( ( comp << 1 ) / var1 );
-  }
-  var1 = ( p->par_p9 * ( ( ( comp >> 3 ) * ( comp >> 3 ) )>> 13 ) ) >> 12;
-  var2 = ( ( comp >> 2 ) * p->par_p8 ) >> 13;
-  var3 = ( ( comp >> 8 ) * ( comp >> 8 ) * ( comp >> 8 ) * p->par_p10 ) >> 17;
-  p->compensated = comp + ( ( var1 + var2 + var3 + ( p->par_p7 << 7 ) ) >> 4 );
+    /*lint -save -e701 -e702 -e713 */
+    var1 = (((int32_t)t->fine) >> 1) - 64000;
+    var2 = ((((var1 >> 2) * (var1 >> 2)) >> 11) * (int32_t)p->par_p6) >> 2;
+    var2 = var2 + ((var1 * (int32_t)p->par_p5) << 1);
+    var2 = (var2 >> 2) + ((int32_t)p->par_p4 << 16);
+    var1 = (((((var1 >> 2) * (var1 >> 2)) >> 13) * ((int32_t)p->par_p3 << 5)) >> 3) +
+           (((int32_t)p->par_p2 * var1) >> 1);
+    var1 = var1 >> 18;
+    var1 = ((32768 + var1) * (int32_t)p->par_p1) >> 15;
+    pressure_comp = 1048576 - p->raw;
+    pressure_comp = (int32_t)((pressure_comp - (var2 >> 12)) * ((uint32_t)3125));
+    if (pressure_comp >= pres_ovf_check) {
+        pressure_comp = ((pressure_comp / var1) << 1);
+    }
+    else {
+        pressure_comp = ((pressure_comp << 1) / var1);
+    }
 
-  //tp( p, t );
+    var1 = ((int32_t)p->par_p9 * (int32_t)(((pressure_comp >> 3) * (pressure_comp >> 3)) >> 13)) >> 12;
+    var2 = ((int32_t)(pressure_comp >> 2) * (int32_t)p->par_p8) >> 13;
+    var3 =
+        ((int32_t)(pressure_comp >> 8) * (int32_t)(pressure_comp >> 8) * (int32_t)(pressure_comp >> 8) *
+         (int32_t)p->par_p10) >> 17;
+    pressure_comp = (int32_t)(pressure_comp) + ((var1 + var2 + var3 + ((int32_t)p->par_p7 << 7)) >> 4);
+
+    p->compensated = pressure_comp;
+
 }
 
 int read_humidity_calibration( int fd_bme680, struct humidity* h ) {
