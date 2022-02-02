@@ -83,9 +83,19 @@ int read_registers( int fd, u8 reg, u8* data, int length ) {
 int read_register( int fd, u8 reg, u8* data ) {
 
   int result;
-
   result = read_registers( fd, reg, data, 1 );
+  return result;
 
+}
+
+int read_register_u8( int fd, u8 reg, uint8_t* data ) {
+  return read_register( fd, reg, data );
+}
+
+int read_register_i8( int fd, u8 reg, int8_t* data ) {
+
+  int result;
+  result = read_registers( fd, reg, data, 1 );
   return result;
 
 }
@@ -151,9 +161,9 @@ int read_temperature_calibration( int fd_bme680, struct temperature* t ) {
 
   int result;
 
-  result = read_uint16(    fd_bme680, calibration_parm_t1_lsb, &t->par_t1 );
-  result = read_int16(     fd_bme680, calibration_parm_t2_lsb, &t->par_t2 );
-  result = read_register(  fd_bme680, calibration_parm_t3,     &t->par_t3 );
+  result = read_uint16(       fd_bme680, calibration_parm_t1_lsb, &t->par_t1 );
+  result = read_int16(        fd_bme680, calibration_parm_t2_lsb, &t->par_t2 );
+  result = read_register_i8(  fd_bme680, calibration_parm_t3,     &t->par_t3 );
 
   return result;
 }
@@ -173,16 +183,16 @@ int read_pressure_calibration( int fd_bme680, struct pressure* p ) {
 
   int result;
 
-  result = read_uint16(   fd_bme680, calibration_parm_p1_lsb, &p->par_p1  );
-  result = read_uint16(   fd_bme680, calibration_parm_p2_lsb, &p->par_p2  );
-  result = read_register( fd_bme680, calibration_parm_p3,     &p->par_p3  );
-  result = read_uint16(   fd_bme680, calibration_parm_p4_lsb, &p->par_p4  );
-  result = read_uint16(   fd_bme680, calibration_parm_p5_lsb, &p->par_p5  );
-  result = read_register( fd_bme680, calibration_parm_p6,     &p->par_p6  );
-  result = read_register( fd_bme680, calibration_parm_p7,     &p->par_p7  );
-  result = read_uint16(   fd_bme680, calibration_parm_p8_lsb, &p->par_p8  );
-  result = read_uint16(   fd_bme680, calibration_parm_p9_lsb, &p->par_p9  );
-  result = read_register( fd_bme680, calibration_parm_pa    , &p->par_p10 );
+  result = read_uint16(      fd_bme680, calibration_parm_p1_lsb, &p->par_p1  );
+  result = read_int16(       fd_bme680, calibration_parm_p2_lsb, &p->par_p2  );
+  result = read_register_i8( fd_bme680, calibration_parm_p3,     &p->par_p3  );
+  result = read_int16(       fd_bme680, calibration_parm_p4_lsb, &p->par_p4  );
+  result = read_int16(       fd_bme680, calibration_parm_p5_lsb, &p->par_p5  );
+  result = read_register_i8( fd_bme680, calibration_parm_p6,     &p->par_p6  );
+  result = read_register_i8( fd_bme680, calibration_parm_p7,     &p->par_p7  );
+  result = read_int16(       fd_bme680, calibration_parm_p8_lsb, &p->par_p8  );
+  result = read_int16(       fd_bme680, calibration_parm_p9_lsb, &p->par_p9  );
+  result = read_register_u8( fd_bme680, calibration_parm_pa    , &p->par_p10 );
 
   return result;
 }
