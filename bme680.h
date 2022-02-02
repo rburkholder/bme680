@@ -191,18 +191,18 @@ int read_temperature_calibration( int fd_bme680, struct temperature* t );
 void compensate_temperature( struct temperature* t );
 
 struct pressure {
-  int32_t par_p1;
-  int32_t par_p2;
-  int32_t par_p3;
-  int32_t par_p4;
-  int32_t par_p5;
-  int32_t par_p6;
-  int32_t par_p7;
-  int32_t par_p8;
-  int32_t par_p9;
-  int32_t par_p10;
-  int32_t raw;
-  int32_t compensated; // pascal
+  uint16_t par_p1;
+  uint16_t par_p2;
+  uint8_t  par_p3;
+  uint16_t par_p4;
+  uint16_t par_p5;
+  uint8_t  par_p6;
+  uint8_t  par_p7;
+  uint16_t par_p8;
+  uint16_t par_p9;
+  uint8_t  par_p10;
+  int32_t  raw;
+  uint32_t compensated; // pascal
 };
 
 int read_pressure_calibration( int fd_bme680, struct pressure* p );

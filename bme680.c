@@ -112,13 +112,8 @@ int read_int16( int fd, u8 reg, int16_t* data ) {
 
   int result = read_registers( fd, reg, buf, 2 );
 
-  //*data = buf[ 1 ];
-  //*data = ( *data << 8 ) | buf[ 0 ];
-
-  *data = ( (int16_t)buf[ 1 ] << 8 ) | (int16_t)buf[ 0 ];
-
-  //data[ 0 ] = buf[ 1 ];
-  //data[ 1 ] = buf[ 0 ];
+  uint16_t t = (buf[ 1 ] << 8) | buf[0];
+  *data = t;
 
   return result;
 }
@@ -157,7 +152,7 @@ int read_temperature_calibration( int fd_bme680, struct temperature* t ) {
   int result;
 
   result = read_uint16(    fd_bme680, calibration_parm_t1_lsb, &t->par_t1 );
-  result = read_int16(    fd_bme680, calibration_parm_t2_lsb, &t->par_t2 );
+  result = read_int16(     fd_bme680, calibration_parm_t2_lsb, &t->par_t2 );
   result = read_register(  fd_bme680, calibration_parm_t3,     &t->par_t3 );
 
   return result;
@@ -178,43 +173,22 @@ int read_pressure_calibration( int fd_bme680, struct pressure* p ) {
 
   int result;
 
-  const int32_t size = 1 + ( 0xa0 - 0x8e );
-  u8 buf[ size ];
-
-  result = read_registers( fd_bme680, 0x8e, buf, size );
-
-  // TODO: migrate the following to match temperature calibration acquisition
-
-  p->par_p1 =                      buf[ 0x8f - 0x8e ];
-  p->par_p1 = ( p->par_p1 << 8 ) | buf[ 0x8e - 0x8e ];
-
-  p->par_p2 =                      buf[ 0x91 - 0x8e ];
-  p->par_p2 = ( p->par_p2 << 8 ) | buf[ 0x90 - 0x8e ];
-
-  p->par_p3 =                      buf[ 0x92 - 0x8e ];
-
-  p->par_p4 =                      buf[ 0x95 - 0x8e ];
-  p->par_p4 = ( p->par_p4 << 8 ) | buf[ 0x94 - 0x8e ];
-
-  p->par_p5 =                      buf[ 0x97 - 0x8e ];
-  p->par_p5 = ( p->par_p5 << 8 ) | buf[ 0x96 - 0x8e ];
-
-  p->par_p6 =                      buf[ 0x99 - 0x8e ];
-
-  p->par_p7 =                      buf[ 0x98 - 0x8e ];
-
-  p->par_p8 =                      buf[ 0x9d - 0x8e ];
-  p->par_p8 = ( p->par_p8 << 8 ) | buf[ 0x9c - 0x8e ];
-
-  p->par_p9 =                      buf[ 0x9f - 0x8e ];
-  p->par_p9 = ( p->par_p9 << 8 ) | buf[ 0x9e - 0x8e ];
-
-  p->par_p10 =                     buf[ 0xa0 - 0x8e ];
+  result = read_uint16(   fd_bme680, calibration_parm_p1_lsb, &p->par_p1  );
+  result = read_uint16(   fd_bme680, calibration_parm_p2_lsb, &p->par_p2  );
+  result = read_register( fd_bme680, calibration_parm_p3,     &p->par_p3  );
+  result = read_uint16(   fd_bme680, calibration_parm_p4_lsb, &p->par_p4  );
+  result = read_uint16(   fd_bme680, calibration_parm_p5_lsb, &p->par_p5  );
+  result = read_register( fd_bme680, calibration_parm_p6,     &p->par_p6  );
+  result = read_register( fd_bme680, calibration_parm_p7,     &p->par_p7  );
+  result = read_uint16(   fd_bme680, calibration_parm_p8_lsb, &p->par_p8  );
+  result = read_uint16(   fd_bme680, calibration_parm_p9_lsb, &p->par_p9  );
+  result = read_register( fd_bme680, calibration_parm_pa    , &p->par_p10 );
 
   return result;
 }
 
-void tp( struct pressure* p, const struct temperature* t ) {
+void comp_pres_dbl( struct pressure* p, const struct temperature* t ) {
+
   double var1, var2, var3, compensated;
 
   var1 = ( (double) t->fine / 2.0 ) - 64000.0;
@@ -246,18 +220,19 @@ void compensate_pressure( struct pressure* p, const struct temperature* t ) {
   var1 = ( ( ( ( ( var1 >> 2 ) * ( var1 >> 2 ) ) >> 13 ) * ( p->par_p3 << 5 ) ) >> 3 ) + ( ( p->par_p2 * var1 ) >> 1 );
   var1 = var1 >> 18;
   var1 = ( ( 32768 + var1 ) * p->par_p1 ) >> 15;
-  p->compensated = 1048576 - p->raw;
-  uint32_t comp = (uint32_t)( ( p->compensated - ( var2 >> 12 ) ) * ( (uint32_t) 3125 ) );
-  if ( comp >= ( 1 << 30 ) ) {
-    comp = ( ( comp / (uint32_t)var1 ) << 1 );
+  p->compensated = (uint32_t)1048576 - p->raw;
+  int32_t comp = ( p->compensated - ( var2 >> 12 ) ) * ( (int32_t) 3125 );
+  const int32_t pres_ovf_check = INT32_C(0x40000000);
+  if ( comp >= pres_ovf_check ) {
+    comp = ( ( comp / var1 ) << 1 );
   }
   else {
-    comp = ( ( comp << 1 ) / (uint32_t)var1 );
+    comp = ( ( comp << 1 ) / var1 );
   }
-  var1 = ( p->par_p9 * (int32_t)( ( ( comp >> 3 ) * ( comp >> 3 ) )>> 13 ) ) >> 12;
-  var2 = ( (int32_t)( comp >> 2 ) * p->par_p8 ) >> 13;
-  var3 = ( (int32_t)( comp >> 8 ) * (int32_t)( comp >> 8 ) * (int32_t)( comp >> 8 ) * p->par_p10 ) >> 17;
-  p->compensated = (int32_t)comp + ( ( var1 + var2 + var3 + ( p->par_p7 << 7 ) ) >> 4 );
+  var1 = ( p->par_p9 * ( ( ( comp >> 3 ) * ( comp >> 3 ) )>> 13 ) ) >> 12;
+  var2 = ( ( comp >> 2 ) * p->par_p8 ) >> 13;
+  var3 = ( ( comp >> 8 ) * ( comp >> 8 ) * ( comp >> 8 ) * p->par_p10 ) >> 17;
+  p->compensated = comp + ( ( var1 + var2 + var3 + ( p->par_p7 << 7 ) ) >> 4 );
 
   //tp( p, t );
 }
@@ -306,7 +281,7 @@ void compensate_humidity( struct humidity* h, const struct temperature* t ) {
 
 }
 
-int measure_pth( int fd_bme680, int32_t* pressure, int32_t* temperature, int32_t* humidity ) {
+int measure_pth( int fd_bme680, int32_t* temperature, int32_t* pressure, int32_t* humidity ) {
 
   int result;
   u8 status;

@@ -114,7 +114,7 @@ void main( int argc, char *argv[] ) {
           timeinfo.tm_min,
           timeinfo.tm_sec);
 
-        result = measure_pth( fd_bme680, &p.raw, &t.raw, &h.raw );
+        result = measure_pth( fd_bme680, &t.raw, &p.raw, &h.raw );
         compensate_temperature( &t );
         compensate_pressure( &p, &t );
         compensate_humidity( &h, &t );
