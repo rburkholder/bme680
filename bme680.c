@@ -288,16 +288,39 @@ int read_humidity_calibration( int fd_bme680, struct humidity* h ) {
 
 void compensate_humidity( struct humidity* h, const struct temperature* t ) {
 
-  int32_t var1 = h->raw - ( h->par_h1 << 4 ) - ( ( ( t->compensated * h->par_h3 ) / 100 ) >> 1 );
-  int32_t var2
-    = ( h->par_h2 * ( ( ( t->compensated * h->par_h4 ) / 100 )
-    + ( ( ( t->compensated * ( ( t->compensated * h->par_h5 )
-    / 100 ) ) ) >> 6 ) / 100 + ( 1 << 14 ) ) )>> 10;
-  int32_t var3 = var1 * var2;
-  int32_t var4 = ( ( h->par_h6 << 7) + ( ( t->compensated * h->par_h7) / 100) ) >> 4;
-  int32_t var5 = ( (var3 >> 14 ) * ( var3 >> 14 ) ) >> 10;
-  int32_t var6 = ( var4 * var5 ) >> 1;
-  h->compensated = ( ( ( var3 + var6 ) >> 10 ) * 1000 ) >> 12;
+    int32_t var1;
+    int32_t var2;
+    int32_t var3;
+    int32_t var4;
+    int32_t var5;
+    int32_t var6;
+    int32_t temp_scaled;
+    int32_t calc_hum;
+
+    temp_scaled = (((int32_t)t->fine * 5) + 128) >> 8;
+    var1 = (int32_t)(h->raw - ((int32_t)((int32_t)h->par_h1 * 16))) -
+           (((temp_scaled * (int32_t)h->par_h3) / ((int32_t)100)) >> 1);
+    var2 =
+        ((int32_t)h->par_h2 *
+         (((temp_scaled * (int32_t)h->par_h4) / ((int32_t)100)) +
+          (((temp_scaled * ((temp_scaled * (int32_t)h->par_h5) / ((int32_t)100))) >> 6) / ((int32_t)100)) +
+          (int32_t)(1 << 14))) >> 10;
+    var3 = var1 * var2;
+    var4 = (int32_t)h->par_h6 << 7;
+    var4 = ((var4) + ((temp_scaled * (int32_t)h->par_h7) / ((int32_t)100))) >> 4;
+    var5 = ((var3 >> 14) * (var3 >> 14)) >> 10;
+    var6 = (var4 * var5) >> 1;
+    calc_hum = (((var3 + var6) >> 10) * ((int32_t)1000)) >> 12;
+    if (calc_hum > 100000) /* Cap at 100%rH */
+    {
+        calc_hum = 100000;
+    }
+    else if (calc_hum < 0)
+    {
+        calc_hum = 0;
+    }
+
+  h->compensated = calc_hum;
 
 }
 
