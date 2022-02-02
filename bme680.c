@@ -217,10 +217,12 @@ void compensate_pressure( struct pressure* p, const struct temperature* t ) {
     int32_t pressure_comp;
 
     /* This value is used to check precedence to multiplication or division
- *      * in the pressure compensation equation to achieve least loss of precision and
- *           * avoiding overflows.
- *                * i.e Comparing value, pres_ovf_check = (1 << 31) >> 1
- *                     */
+     * in the pressure compensation equation to achieve least loss of precision and
+     * avoiding overflows.
+     * i.e Comparing value, pres_ovf_check = (1 << 31) >> 1
+     *
+     * from https://github.com/BoschSensortec/BME68x-Sensor-API/blob/master/bme68x.c
+     */
     const int32_t pres_ovf_check = INT32_C(0x40000000);
 
     /*lint -save -e701 -e702 -e713 */
