@@ -32,6 +32,14 @@
 
 void main( int argc, char *argv[] ) {
 
+  if ( 2 == argc ) {
+    printf( "domo idx: %s\n", argv[ 1 ] );
+  }
+  else {
+    printf( "need a domo device idx" );
+    exit(EXIT_FAILURE);
+  }
+
   int rc;
 
   char szHostName[ HOST_NAME_MAX + 1 ];
@@ -99,7 +107,8 @@ void main( int argc, char *argv[] ) {
       time_t now;
       struct tm timeinfo;
       unsigned char szTimeInfo[ 50 ];
-      const unsigned char szTopic[] = "/beagle/bme680";
+      const unsigned char szTopic_nr[] = "/beagle/bme680";
+      const unsigned char szTopic_domo[] = "domoticz/in";
 
       while ( 1 ) {
 
@@ -142,14 +151,31 @@ void main( int argc, char *argv[] ) {
         pubmsg.payloadlen = sizeMessage;
         pubmsg.qos = QOS;
         pubmsg.retained = 0;
-        if ( (rc = MQTTClient_publishMessage(client, szTopic, &pubmsg, &token)) != MQTTCLIENT_SUCCESS) {
+        if ( (rc = MQTTClient_publishMessage(client, szTopic_nr, &pubmsg, &token)) != MQTTCLIENT_SUCCESS) {
           printf("Failed to publish message, return code %d\n", rc);
         }
         else {
           rc = MQTTClient_waitForCompletion(client, token, TIMEOUT);
-          printf("Message %d: %s=%s\n", token, szTopic, szMessage );
+          printf("Message %d: %s=%s\n", token, szTopic_nr, szMessage );
         }
 
+        sizeMessage = snprintf(
+          szMessage, max_buf_size,
+          "{\"command\":\"udevice\",\"idx\":%s,\"nvalue\":0,\"svalue\":\"%0.2f;%0.3f;0;%0.2f;0\"}",
+          argv[ 1 ], temperature, humidity, pressure
+          );
+
+        pubmsg.payload = szMessage;
+        pubmsg.payloadlen = sizeMessage;
+        pubmsg.qos = QOS;
+        pubmsg.retained = 0;
+        if ( (rc = MQTTClient_publishMessage(client, szTopic_domo, &pubmsg, &token)) != MQTTCLIENT_SUCCESS) {
+          printf("Failed to publish message, return code %d\n", rc);
+        }
+        else {
+          rc = MQTTClient_waitForCompletion(client, token, TIMEOUT);
+          printf("Message %d: %s=%s\n", token, szTopic_domo, szMessage );
+        }
         printf( "\n" );
 
         sleep( 20 );
