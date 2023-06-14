@@ -32,11 +32,11 @@
 
 void main( int argc, char *argv[] ) {
 
-  if ( 2 == argc ) {
-    printf( "domo idx: %s\n", argv[ 1 ] );
+  if ( 3 == argc ) {
+    printf( "domo idx: %s, location %s\n", argv[ 1 ], argv[ 2 ] );
   }
   else {
-    printf( "need a domo device idx" );
+    printf( "need domo device idx, location\n" );
     exit(EXIT_FAILURE);
   }
 
@@ -78,6 +78,7 @@ void main( int argc, char *argv[] ) {
   }
 
   #define max_buf_size 500
+  char szTopic[ max_buf_size ];
   char szMessage[ max_buf_size ];
 
   if ( 0 <= fd_bme680 ) {
@@ -109,6 +110,7 @@ void main( int argc, char *argv[] ) {
       unsigned char szTimeInfo[ 50 ];
       const unsigned char szTopic_nr[] = "/beagle/bme680";
       const unsigned char szTopic_domo[] = "domoticz/in";
+      const unsigned char szTopic_apparition[] = "beagle";
 
       while ( 1 ) {
 
@@ -139,7 +141,10 @@ void main( int argc, char *argv[] ) {
           h.raw, humidity
           );
 
+        int sizeTopic;
         int sizeMessage;
+
+        // message for node-red
 
         sizeMessage = snprintf(
           szMessage, max_buf_size,
@@ -152,12 +157,14 @@ void main( int argc, char *argv[] ) {
         pubmsg.qos = QOS;
         pubmsg.retained = 0;
         if ( (rc = MQTTClient_publishMessage(client, szTopic_nr, &pubmsg, &token)) != MQTTCLIENT_SUCCESS) {
-          printf("Failed to publish message, return code %d\n", rc);
+          printf("Failed to publish node-red message, return code %d\n", rc);
         }
         else {
           rc = MQTTClient_waitForCompletion(client, token, TIMEOUT);
           printf("Message %d: %s=%s\n", token, szTopic_nr, szMessage );
         }
+
+        // message for domoticz - to be deprecated
 
         sizeMessage = snprintf(
           szMessage, max_buf_size,
@@ -170,12 +177,40 @@ void main( int argc, char *argv[] ) {
         pubmsg.qos = QOS;
         pubmsg.retained = 0;
         if ( (rc = MQTTClient_publishMessage(client, szTopic_domo, &pubmsg, &token)) != MQTTCLIENT_SUCCESS) {
-          printf("Failed to publish message, return code %d\n", rc);
+          printf("Failed to publish domoticz message, return code %d\n", rc);
         }
         else {
           rc = MQTTClient_waitForCompletion(client, token, TIMEOUT);
           printf("Message %d: %s=%s\n", token, szTopic_domo, szMessage );
         }
+
+        // message for apparition
+
+        sizeMessage = snprintf(
+          szMessage, max_buf_size,
+          "{\"ti\":\"%s\",\"t\":%0.2f,\"p\":%0.2f,\"h\":%0.3f}",
+          szTimeInfo, temperature, pressure, humidity
+          );
+
+        sizeTopic = snprintf(
+          szTopic, max_buf_size,
+          "beagle/%s/bme680", argv[ 2 ]
+          );
+
+        pubmsg.payload = szMessage;
+        pubmsg.payloadlen = sizeMessage;
+        pubmsg.qos = QOS;
+        pubmsg.retained = 0;
+        if ( (rc = MQTTClient_publishMessage(client, szTopic, &pubmsg, &token)) != MQTTCLIENT_SUCCESS) {
+          printf("Failed to publish apparition message, return code %d\n", rc);
+        }
+        else {
+          rc = MQTTClient_waitForCompletion(client, token, TIMEOUT);
+          printf("Message %d: %s=%s\n", token, szTopic, szMessage );
+        }
+
+        // finish up
+
         printf( "\n" );
 
         sleep( 20 );
