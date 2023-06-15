@@ -165,7 +165,7 @@ void main( int argc, char *argv[] ) {
         }
 
         // message for domoticz - to be deprecated
-
+/*
         sizeMessage = snprintf(
           szMessage, max_buf_size,
           "{\"command\":\"udevice\",\"idx\":%s,\"nvalue\":0,\"svalue\":\"%0.2f;%0.3f;0;%0.2f;0\"}",
@@ -183,7 +183,7 @@ void main( int argc, char *argv[] ) {
           rc = MQTTClient_waitForCompletion(client, token, TIMEOUT);
           printf("Message %d: %s=%s\n", token, szTopic_domo, szMessage );
         }
-
+*/
         // message for apparition
 
         sizeMessage = snprintf(
