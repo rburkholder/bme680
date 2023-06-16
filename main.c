@@ -188,13 +188,13 @@ void main( int argc, char *argv[] ) {
 
         sizeMessage = snprintf(
           szMessage, max_buf_size,
-          "{\"ti\":\"%s\",\"t\":%0.2f,\"p\":%0.2f,\"h\":%0.3f}",
-          szTimeInfo, temperature, pressure, humidity
+          "{\"ti\":\"%s\",\"l\":\"%s\",\"t\":%0.2f,\"p\":%0.2f,\"h\":%0.3f}",
+          szTimeInfo, argv[ 2 ], temperature, pressure, humidity
           );
 
         sizeTopic = snprintf(
           szTopic, max_buf_size,
-          "beagle/%s/bme680", argv[ 2 ]
+          "bb/%s/bme680", argv[ 1 ]
           );
 
         pubmsg.payload = szMessage;
