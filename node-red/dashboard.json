@@ -445,8 +445,7 @@
         "y": 680,
         "wires": [
             [
-                "eb7dd7a246276c6c",
-                "281d502a4c525d57"
+                "eb7dd7a246276c6c"
             ]
         ]
     },
@@ -473,8 +472,7 @@
         "y": 760,
         "wires": [
             [
-                "a76461da4fbddcf0",
-                "1bcda5d965da9a3c"
+                "a76461da4fbddcf0"
             ]
         ]
     },
@@ -501,141 +499,8 @@
         "y": 840,
         "wires": [
             [
-                "87d2e48dba3afbf5",
-                "9aae0d6375c05ca5"
+                "87d2e48dba3afbf5"
             ]
-        ]
-    },
-    {
-        "id": "281d502a4c525d57",
-        "type": "ui_chart",
-        "z": "dedb609fdca782cf",
-        "name": "",
-        "group": "0140d16004fcade8",
-        "order": 4,
-        "width": 0,
-        "height": 0,
-        "label": "bb02 Temperature Chart",
-        "chartType": "line",
-        "legend": "false",
-        "xformat": "HH:mm:ss",
-        "interpolate": "linear",
-        "nodata": "",
-        "dot": false,
-        "ymin": "-30",
-        "ymax": "40",
-        "removeOlder": "6",
-        "removeOlderPoints": "1000",
-        "removeOlderUnit": "3600",
-        "cutout": 0,
-        "useOneColor": false,
-        "useUTC": false,
-        "colors": [
-            "#1f77b4",
-            "#aec7e8",
-            "#ff7f0e",
-            "#2ca02c",
-            "#98df8a",
-            "#d62728",
-            "#ff9896",
-            "#9467bd",
-            "#c5b0d5"
-        ],
-        "outputs": 1,
-        "useDifferentColor": false,
-        "className": "",
-        "x": 790,
-        "y": 700,
-        "wires": [
-            []
-        ]
-    },
-    {
-        "id": "1bcda5d965da9a3c",
-        "type": "ui_chart",
-        "z": "dedb609fdca782cf",
-        "name": "",
-        "group": "17aa9ac215792b8f",
-        "order": 4,
-        "width": 0,
-        "height": 0,
-        "label": "bb02 Pressure Chart",
-        "chartType": "line",
-        "legend": "false",
-        "xformat": "HH:mm:ss",
-        "interpolate": "linear",
-        "nodata": "",
-        "dot": false,
-        "ymin": "850",
-        "ymax": "1050",
-        "removeOlder": "6",
-        "removeOlderPoints": "1000",
-        "removeOlderUnit": "3600",
-        "cutout": 0,
-        "useOneColor": false,
-        "useUTC": false,
-        "colors": [
-            "#1f77b4",
-            "#aec7e8",
-            "#ff7f0e",
-            "#2ca02c",
-            "#98df8a",
-            "#d62728",
-            "#ff9896",
-            "#9467bd",
-            "#c5b0d5"
-        ],
-        "outputs": 1,
-        "useDifferentColor": false,
-        "className": "",
-        "x": 700,
-        "y": 780,
-        "wires": [
-            []
-        ]
-    },
-    {
-        "id": "9aae0d6375c05ca5",
-        "type": "ui_chart",
-        "z": "dedb609fdca782cf",
-        "name": "",
-        "group": "9b40f3942ccabeb0",
-        "order": 4,
-        "width": 0,
-        "height": 0,
-        "label": "bb02 Humidity Chart",
-        "chartType": "line",
-        "legend": "false",
-        "xformat": "HH:mm:ss",
-        "interpolate": "linear",
-        "nodata": "",
-        "dot": false,
-        "ymin": "0",
-        "ymax": "100",
-        "removeOlder": "6",
-        "removeOlderPoints": "1000",
-        "removeOlderUnit": "3600",
-        "cutout": 0,
-        "useOneColor": false,
-        "useUTC": false,
-        "colors": [
-            "#1f77b4",
-            "#aec7e8",
-            "#ff7f0e",
-            "#2ca02c",
-            "#98df8a",
-            "#d62728",
-            "#ff9896",
-            "#9467bd",
-            "#c5b0d5"
-        ],
-        "outputs": 1,
-        "useDifferentColor": false,
-        "className": "",
-        "x": 700,
-        "y": 860,
-        "wires": [
-            []
         ]
     },
     {
@@ -742,8 +607,7 @@
         "y": 960,
         "wires": [
             [
-                "a77e6c97560c9e65",
-                "5a3316df130eec36"
+                "a77e6c97560c9e65"
             ]
         ]
     },
@@ -770,8 +634,7 @@
         "y": 1040,
         "wires": [
             [
-                "26125aaae8d16766",
-                "7da992154c826236"
+                "26125aaae8d16766"
             ]
         ]
     },
@@ -798,141 +661,8 @@
         "y": 1120,
         "wires": [
             [
-                "05e7353bb3a63ec7",
-                "7f0929c91ada1e46"
+                "05e7353bb3a63ec7"
             ]
-        ]
-    },
-    {
-        "id": "5a3316df130eec36",
-        "type": "ui_chart",
-        "z": "dedb609fdca782cf",
-        "name": "",
-        "group": "0140d16004fcade8",
-        "order": 6,
-        "width": 0,
-        "height": 0,
-        "label": "bb03 Temperature Chart",
-        "chartType": "line",
-        "legend": "false",
-        "xformat": "HH:mm:ss",
-        "interpolate": "linear",
-        "nodata": "",
-        "dot": false,
-        "ymin": "-30",
-        "ymax": "40",
-        "removeOlder": "6",
-        "removeOlderPoints": "1000",
-        "removeOlderUnit": "3600",
-        "cutout": 0,
-        "useOneColor": false,
-        "useUTC": false,
-        "colors": [
-            "#1f77b4",
-            "#aec7e8",
-            "#ff7f0e",
-            "#2ca02c",
-            "#98df8a",
-            "#d62728",
-            "#ff9896",
-            "#9467bd",
-            "#c5b0d5"
-        ],
-        "outputs": 1,
-        "useDifferentColor": false,
-        "className": "",
-        "x": 790,
-        "y": 980,
-        "wires": [
-            []
-        ]
-    },
-    {
-        "id": "7da992154c826236",
-        "type": "ui_chart",
-        "z": "dedb609fdca782cf",
-        "name": "",
-        "group": "17aa9ac215792b8f",
-        "order": 6,
-        "width": 0,
-        "height": 0,
-        "label": "bb03 Pressure Chart",
-        "chartType": "line",
-        "legend": "false",
-        "xformat": "HH:mm:ss",
-        "interpolate": "linear",
-        "nodata": "",
-        "dot": false,
-        "ymin": "850",
-        "ymax": "1050",
-        "removeOlder": "6",
-        "removeOlderPoints": "1000",
-        "removeOlderUnit": "3600",
-        "cutout": 0,
-        "useOneColor": false,
-        "useUTC": false,
-        "colors": [
-            "#1f77b4",
-            "#aec7e8",
-            "#ff7f0e",
-            "#2ca02c",
-            "#98df8a",
-            "#d62728",
-            "#ff9896",
-            "#9467bd",
-            "#c5b0d5"
-        ],
-        "outputs": 1,
-        "useDifferentColor": false,
-        "className": "",
-        "x": 700,
-        "y": 1060,
-        "wires": [
-            []
-        ]
-    },
-    {
-        "id": "7f0929c91ada1e46",
-        "type": "ui_chart",
-        "z": "dedb609fdca782cf",
-        "name": "",
-        "group": "9b40f3942ccabeb0",
-        "order": 6,
-        "width": 0,
-        "height": 0,
-        "label": "bb03 Humidity Chart",
-        "chartType": "line",
-        "legend": "false",
-        "xformat": "HH:mm:ss",
-        "interpolate": "linear",
-        "nodata": "",
-        "dot": false,
-        "ymin": "0",
-        "ymax": "100",
-        "removeOlder": "6",
-        "removeOlderPoints": "1000",
-        "removeOlderUnit": "3600",
-        "cutout": 0,
-        "useOneColor": false,
-        "useUTC": false,
-        "colors": [
-            "#1f77b4",
-            "#aec7e8",
-            "#ff7f0e",
-            "#2ca02c",
-            "#98df8a",
-            "#d62728",
-            "#ff9896",
-            "#9467bd",
-            "#c5b0d5"
-        ],
-        "outputs": 1,
-        "useDifferentColor": false,
-        "className": "",
-        "x": 700,
-        "y": 1140,
-        "wires": [
-            []
         ]
     },
     {
@@ -1039,8 +769,7 @@
         "y": 1240,
         "wires": [
             [
-                "12d338f88583dd56",
-                "d4c747eb0ee6cc29"
+                "12d338f88583dd56"
             ]
         ]
     },
@@ -1067,8 +796,7 @@
         "y": 1320,
         "wires": [
             [
-                "f3181cca0982c597",
-                "db7cedf2e061b012"
+                "f3181cca0982c597"
             ]
         ]
     },
@@ -1095,141 +823,8 @@
         "y": 1400,
         "wires": [
             [
-                "0892177a1e3acfd1",
-                "1510980bda36be1c"
+                "0892177a1e3acfd1"
             ]
-        ]
-    },
-    {
-        "id": "d4c747eb0ee6cc29",
-        "type": "ui_chart",
-        "z": "dedb609fdca782cf",
-        "name": "",
-        "group": "0140d16004fcade8",
-        "order": 8,
-        "width": 0,
-        "height": 0,
-        "label": "bb04 Temperature Chart",
-        "chartType": "line",
-        "legend": "false",
-        "xformat": "HH:mm:ss",
-        "interpolate": "linear",
-        "nodata": "",
-        "dot": false,
-        "ymin": "-30",
-        "ymax": "40",
-        "removeOlder": "6",
-        "removeOlderPoints": "1000",
-        "removeOlderUnit": "3600",
-        "cutout": 0,
-        "useOneColor": false,
-        "useUTC": false,
-        "colors": [
-            "#1f77b4",
-            "#aec7e8",
-            "#ff7f0e",
-            "#2ca02c",
-            "#98df8a",
-            "#d62728",
-            "#ff9896",
-            "#9467bd",
-            "#c5b0d5"
-        ],
-        "outputs": 1,
-        "useDifferentColor": false,
-        "className": "",
-        "x": 790,
-        "y": 1260,
-        "wires": [
-            []
-        ]
-    },
-    {
-        "id": "db7cedf2e061b012",
-        "type": "ui_chart",
-        "z": "dedb609fdca782cf",
-        "name": "",
-        "group": "17aa9ac215792b8f",
-        "order": 8,
-        "width": 0,
-        "height": 0,
-        "label": "bb04 Pressure Chart",
-        "chartType": "line",
-        "legend": "false",
-        "xformat": "HH:mm:ss",
-        "interpolate": "linear",
-        "nodata": "",
-        "dot": false,
-        "ymin": "850",
-        "ymax": "1050",
-        "removeOlder": "6",
-        "removeOlderPoints": "1000",
-        "removeOlderUnit": "3600",
-        "cutout": 0,
-        "useOneColor": false,
-        "useUTC": false,
-        "colors": [
-            "#1f77b4",
-            "#aec7e8",
-            "#ff7f0e",
-            "#2ca02c",
-            "#98df8a",
-            "#d62728",
-            "#ff9896",
-            "#9467bd",
-            "#c5b0d5"
-        ],
-        "outputs": 1,
-        "useDifferentColor": false,
-        "className": "",
-        "x": 700,
-        "y": 1340,
-        "wires": [
-            []
-        ]
-    },
-    {
-        "id": "1510980bda36be1c",
-        "type": "ui_chart",
-        "z": "dedb609fdca782cf",
-        "name": "",
-        "group": "9b40f3942ccabeb0",
-        "order": 8,
-        "width": 0,
-        "height": 0,
-        "label": "bb04 Humidity Chart",
-        "chartType": "line",
-        "legend": "false",
-        "xformat": "HH:mm:ss",
-        "interpolate": "linear",
-        "nodata": "",
-        "dot": false,
-        "ymin": "0",
-        "ymax": "100",
-        "removeOlder": "6",
-        "removeOlderPoints": "1000",
-        "removeOlderUnit": "3600",
-        "cutout": 0,
-        "useOneColor": false,
-        "useUTC": false,
-        "colors": [
-            "#1f77b4",
-            "#aec7e8",
-            "#ff7f0e",
-            "#2ca02c",
-            "#98df8a",
-            "#d62728",
-            "#ff9896",
-            "#9467bd",
-            "#c5b0d5"
-        ],
-        "outputs": 1,
-        "useDifferentColor": false,
-        "className": "",
-        "x": 700,
-        "y": 1420,
-        "wires": [
-            []
         ]
     },
     {
@@ -1287,50 +882,6 @@
         "wires": []
     },
     {
-        "id": "f3c4c0a460ea1fc3",
-        "type": "ui_chart",
-        "z": "dedb609fdca782cf",
-        "name": "",
-        "group": "0140d16004fcade8",
-        "order": 2,
-        "width": 0,
-        "height": 0,
-        "label": "bb01 Temperature Chart",
-        "chartType": "line",
-        "legend": "false",
-        "xformat": "HH:mm:ss",
-        "interpolate": "linear",
-        "nodata": "",
-        "dot": false,
-        "ymin": "-30",
-        "ymax": "40",
-        "removeOlder": "6",
-        "removeOlderPoints": "1000",
-        "removeOlderUnit": "3600",
-        "cutout": 0,
-        "useOneColor": false,
-        "useUTC": false,
-        "colors": [
-            "#1f77b4",
-            "#aec7e8",
-            "#ff7f0e",
-            "#2ca02c",
-            "#98df8a",
-            "#d62728",
-            "#ff9896",
-            "#9467bd",
-            "#c5b0d5"
-        ],
-        "outputs": 1,
-        "useDifferentColor": false,
-        "className": "",
-        "x": 770,
-        "y": 400,
-        "wires": [
-            []
-        ]
-    },
-    {
         "id": "113969b41039dab8",
         "type": "ui_gauge",
         "z": "dedb609fdca782cf",
@@ -1356,50 +907,6 @@
         "x": 720,
         "y": 440,
         "wires": []
-    },
-    {
-        "id": "62bfd4481f360e4b",
-        "type": "ui_chart",
-        "z": "dedb609fdca782cf",
-        "name": "",
-        "group": "17aa9ac215792b8f",
-        "order": 2,
-        "width": 0,
-        "height": 0,
-        "label": "bb01 Pressure Chart",
-        "chartType": "line",
-        "legend": "false",
-        "xformat": "HH:mm:ss",
-        "interpolate": "linear",
-        "nodata": "",
-        "dot": false,
-        "ymin": "850",
-        "ymax": "1050",
-        "removeOlder": "6",
-        "removeOlderPoints": "1000",
-        "removeOlderUnit": "3600",
-        "cutout": 0,
-        "useOneColor": false,
-        "useUTC": false,
-        "colors": [
-            "#1f77b4",
-            "#aec7e8",
-            "#ff7f0e",
-            "#2ca02c",
-            "#98df8a",
-            "#d62728",
-            "#ff9896",
-            "#9467bd",
-            "#c5b0d5"
-        ],
-        "outputs": 1,
-        "useDifferentColor": false,
-        "className": "",
-        "x": 720,
-        "y": 480,
-        "wires": [
-            []
-        ]
     },
     {
         "id": "cea8e001a3fa1ac9",
@@ -1429,50 +936,6 @@
         "wires": []
     },
     {
-        "id": "b71413c0f13ea0b2",
-        "type": "ui_chart",
-        "z": "dedb609fdca782cf",
-        "name": "",
-        "group": "9b40f3942ccabeb0",
-        "order": 2,
-        "width": 0,
-        "height": 0,
-        "label": "bb01 Humidity Chart",
-        "chartType": "line",
-        "legend": "false",
-        "xformat": "HH:mm:ss",
-        "interpolate": "linear",
-        "nodata": "",
-        "dot": false,
-        "ymin": "0",
-        "ymax": "100",
-        "removeOlder": "6",
-        "removeOlderPoints": "1000",
-        "removeOlderUnit": "3600",
-        "cutout": 0,
-        "useOneColor": false,
-        "useUTC": false,
-        "colors": [
-            "#1f77b4",
-            "#aec7e8",
-            "#ff7f0e",
-            "#2ca02c",
-            "#98df8a",
-            "#d62728",
-            "#ff9896",
-            "#9467bd",
-            "#c5b0d5"
-        ],
-        "outputs": 1,
-        "useDifferentColor": false,
-        "className": "",
-        "x": 720,
-        "y": 560,
-        "wires": [
-            []
-        ]
-    },
-    {
         "id": "086424b45852bcd4",
         "type": "change",
         "z": "dedb609fdca782cf",
@@ -1495,8 +958,7 @@
         "y": 540,
         "wires": [
             [
-                "cea8e001a3fa1ac9",
-                "b71413c0f13ea0b2"
+                "cea8e001a3fa1ac9"
             ]
         ]
     },
@@ -1523,8 +985,7 @@
         "y": 460,
         "wires": [
             [
-                "113969b41039dab8",
-                "62bfd4481f360e4b"
+                "113969b41039dab8"
             ]
         ]
     },
@@ -1551,8 +1012,7 @@
         "y": 380,
         "wires": [
             [
-                "9b5d47f3633268d8",
-                "f3c4c0a460ea1fc3"
+                "9b5d47f3633268d8"
             ]
         ]
     },
@@ -1616,9 +1076,7 @@
         "x": 150,
         "y": 220,
         "wires": [
-            [
-                "7bf8fb1763c5bf9b"
-            ]
+            []
         ]
     },
     {
@@ -1648,11 +1106,16 @@
                 "t": "eq",
                 "v": "Acurite-5n1",
                 "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "Neptune-R900",
+                "vt": "str"
             }
         ],
         "checkall": "true",
         "repair": false,
-        "outputs": 4,
+        "outputs": 5,
         "x": 190,
         "y": 320,
         "wires": [
@@ -1667,6 +1130,9 @@
             ],
             [
                 "7e05fe2fea7cb5b7"
+            ],
+            [
+                "bf654eee6e9e972c"
             ]
         ]
     },
@@ -1699,9 +1165,9 @@
                 "7175cae1026d1d8d",
                 "1e5759c5700106c8",
                 "5c249f909f094174",
-                "40fc984a854a8f2b",
                 "38510b80cca55a6f",
-                "db2b82d700ba7391"
+                "db2b82d700ba7391",
+                "40fc984a854a8f2b"
             ]
         ]
     },
@@ -2159,7 +1625,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 600,
+        "x": 620,
         "y": 620,
         "wires": [
             [
@@ -2196,7 +1662,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 580,
+        "x": 600,
         "y": 660,
         "wires": [
             [
@@ -2233,7 +1699,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 600,
+        "x": 620,
         "y": 720,
         "wires": [
             [
@@ -2252,7 +1718,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 580,
+        "x": 600,
         "y": 760,
         "wires": [
             [
@@ -2271,7 +1737,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 580,
+        "x": 600,
         "y": 820,
         "wires": [
             [
@@ -2290,7 +1756,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 580,
+        "x": 600,
         "y": 860,
         "wires": [
             [
@@ -2430,7 +1896,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 590,
+        "x": 610,
         "y": 920,
         "wires": [
             [
@@ -2461,13 +1927,13 @@
         "type": "function",
         "z": "fe9aebd46da3c6df",
         "name": "tower_rain",
-        "func": "var rain = msg.payload.rain_in / 25.4;\nmsg.payload = { \n  \"command\": \"udevice\", \n  \"idx\": 56, \n  \"nvalue\": 0,\n  \"svalue\": \n    \"0;\" + rain.toString(),\n  \"rssi\": msg.payload.rssi\n};\nreturn msg;",
+        "func": "var rain = msg.payload.rain_in * 25.4;\nmsg.payload = { \n  \"command\": \"udevice\", \n  \"idx\": 56, \n  \"nvalue\": 0,\n  \"svalue\": \n    \"0;\" + rain.toString(),\n  \"rssi\": msg.payload.rssi\n};\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 590,
+        "x": 610,
         "y": 960,
         "wires": [
             [
@@ -2492,5 +1958,106 @@
         "x": 790,
         "y": 960,
         "wires": []
+    },
+    {
+        "id": "bf654eee6e9e972c",
+        "type": "switch",
+        "z": "fe9aebd46da3c6df",
+        "name": "Neptune",
+        "property": "payload.id",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "1830357134",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 360,
+        "y": 1080,
+        "wires": [
+            [
+                "910ff9f039ee4a3c",
+                "76a84a3a42b76090"
+            ]
+        ]
+    },
+    {
+        "id": "910ff9f039ee4a3c",
+        "type": "function",
+        "z": "fe9aebd46da3c6df",
+        "name": "neptune_flow",
+        "func": "//var rain = msg.payload.rain_in * 25.4;\nmsg.payload = { \n  \"command\": \"udevice\", \n  \"idx\": 57, \n  \"nvalue\": 0,\n  \"svalue\": msg.payload.leak.toString(),\n  \"rssi\": msg.payload.rssi\n};\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 610,
+        "y": 1080,
+        "wires": [
+            [
+                "be578fda38e461f5"
+            ]
+        ]
+    },
+    {
+        "id": "76a84a3a42b76090",
+        "type": "function",
+        "z": "fe9aebd46da3c6df",
+        "name": "neptune_consumption",
+        "func": "var consumption = msg.payload.consumption;\nmsg.payload = { \n  \"command\": \"udevice\", \n  \"idx\": 58, \n  \"nvalue\": 0,\n  \"svalue\": consumption.toString(),\n  \"rssi\": msg.payload.rssi\n};\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 640,
+        "y": 1120,
+        "wires": [
+            [
+                "c634d930120f67e7"
+            ]
+        ]
+    },
+    {
+        "id": "c634d930120f67e7",
+        "type": "mqtt out",
+        "z": "fe9aebd46da3c6df",
+        "name": "",
+        "topic": "domoticz/in",
+        "qos": "1",
+        "retain": "false",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "bff3027feee406c2",
+        "x": 850,
+        "y": 1120,
+        "wires": []
+    },
+    {
+        "id": "be578fda38e461f5",
+        "type": "mqtt out",
+        "z": "fe9aebd46da3c6df",
+        "name": "",
+        "topic": "domoticz/in",
+        "qos": "1",
+        "retain": "false",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "bff3027feee406c2",
+        "x": 850,
+        "y": 1080,
+        "wires": []
     }
 ]
+
