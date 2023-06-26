@@ -145,7 +145,7 @@ void main( int argc, char *argv[] ) {
         int sizeMessage;
 
         // message for node-red
-
+/*
         sizeMessage = snprintf(
           szMessage, max_buf_size,
           "{\"device\":\"%s\",\"values\":{\"ti\":\"%s\",\"t\":%0.2f,\"p\":%0.2f,\"h\":%0.3f}}",
@@ -163,7 +163,7 @@ void main( int argc, char *argv[] ) {
           rc = MQTTClient_waitForCompletion(client, token, TIMEOUT);
           printf("Message %d: %s=%s\n", token, szTopic_nr, szMessage );
         }
-
+*/
         // message for domoticz - to be deprecated
 /*
         sizeMessage = snprintf(
