@@ -1,0 +1,26 @@
+# sudo mkdir -p /usr/local/lib/systemd/system
+# sudo vim /usr/local/lib/systemd/system/bme680.service
+# sudo systemctl enable bme680
+# sudo systemctl daemon-reload
+# sudo systemctl start bme680
+[Unit]
+Description=BME680 Collector
+Documentation=https://github.com/rburkholder/bme680
+After=network.target
+
+[Service]
+Type=simple
+User=debian
+WorkingDirectory=/home/debian
+Environment="ID=02" "LOCATION=top floor"
+ExecStart=/home/debian/bme680/build/bme680-mqtt ${ID} ${LOCATION}
+ExecReload=kill -HUP $MAINPID
+KillMode=process
+Restart=on-failure
+RestartSec=5s
+StandardOutput=null
+# note change with logrotate implemented, or to a memory file
+
+[Install]
+WantedBy=multi-user.target
+
